@@ -7,7 +7,7 @@ API_BASE_URL = "https://api.exchangerate-api.com/v4/latest/"
 
 
 async def get_exchange_rate(from_currency: str, to_currency: str) -> float:
-    response = requests.get(f"{API_BASE_URL}{from_currency.upper()}") 
+    response = requests.get(f"{API_BASE_URL}{from_currency.upper()}")
     if response.status_code == 200:
         data = response.json()
         if to_currency.upper() in data["rates"]:
@@ -38,36 +38,27 @@ async def convert_amount(from_currency: str, to_currency: str, amount: float) ->
         "amount": amount,
         "converted_amount": converted_amount,
     }
-  
+
 # @CODE : AN ENDPOINT THAT TAKES A STRING AND CONFIRMS IT HAS
 # AT LEAST ONE UPPERCASE LETTER, ONE LOWERCASE LETTER, ONE NUMBER, AND IS 8 OR MORE CHARACTERS
 # Make sure the return type matches the function signature, FastAPI enforces that it does!
-@app.get("/check_password_strength")
-async def check_password_strength(password: str) -> bool:
-    # check if string length is 8, has one lowercase and one uppercase
-    return not password.isdigit() and not password.isalpha() and not password.islower() and not password.isupper() and not password.isspace() and (len(password) >= 8):
+#@app.get("/check_password_strength")
+#async def check_password_strength(password: str) -> bool:
 #    """
-#    Coded By: Rey  
-#    This function checks whether a given password is strong enough, i.e., it contains at least one digit, 
+#    Coded By: <name>
+#    This function checks whether a given password is strong enough, i.e., it contains at least one digit,
 #    one lowercase letter, one uppercase letter, and is 8 characters long.
 #    """
 
 
-# @CODE : ADD ENDPOINT TO LIST ALL AVAILABLE CURRENCIES  
-# NOTE : FastAPI enforces that the return type of the function matches the function signature!  
+# @CODE : ADD ENDPOINT TO LIST ALL AVAILABLE CURRENCIES
+# NOTE : FastAPI enforces that the return type of the function matches the function signature!
 #        This is a common error!
-@app.get("/available_currencies")
-async def available_currencies(from_currency: str) -> dict:
-    currencies = await requests.get(f"{API_BASE_URL}{from_currency.upper()}") 
-    # format this to the json
-    if currencies.status_code == 200:
-        data = currencies.json()
-        return list(data["rates"].keys())
-    else:
-        raise HTTPException(status_code=400, detail="Unable to get currencies")
+#@app.get("/available_currencies")
+#async def available_currencies(from_currency: str) -> dict:
 #    """
-#    Coded by: Rey 
-#    This endpoint returns a list of available fiat currencies that can be paired with the @from_currency parameter.  
+#    Coded by: <name>
+#    This endpoint returns a list of available fiat currencies that can be paired with the @from_currency parameter.
 #    @from_currency : str - you must specify a currency to see what currencies it can be compared against.
 #    """
 
@@ -75,27 +66,23 @@ async def available_currencies(from_currency: str) -> dict:
 # @CODE : ADD ENDPOINT TO GET LIST OF CRYPTO CURRENCIES
 # You can use this API https://docs.cloud.coinbase.com/sign-in-with-coinbase/docs/api-currencies
 # Search for the endpoint that returns all the crypto currencies.
-@app.get("/available_crypto")
-async def available_crypto() -> dict:
-    ENDPOINT = "https://api.coinbase.com/v2/currencies/crypto"
-    crypto_currencies = await requests.get(ENDPOINT)
-    data = crypto_currencies.json()
-    return list(data["name"])
+#@app.get("/available_crypto")
+#async def available_crypto() -> dict:
 #    """
-#    Coded by: <name>  
-#    This endpoint allows you to see what crypto-currencies are available  
+#    Coded by: <name>
+#    This endpoint allows you to see what crypto-currencies are available
 #    """
 
-    
-# @CODE : ADD ENDPOINT TO GET Price of crypto  
+
+# @CODE : ADD ENDPOINT TO GET Price of crypto
 # Use the coinbase API from above
 # @app.get("/convert_crypto")
 # async def convert_crypto(from_crypto: str, to_currency: str) -> dict:
 #    """
-#    Coded by: <name>  
-#    This endpoint allows you to get a quote for a crypto in any supported currency  
-#    @from_crypto - chose a crypto currency (eg. BTC, or ETH)  
-#    @to_currency - chose a currency to obtain the price in (eg. USD, or CAD)  
+#    Coded by: <name>
+#    This endpoint allows you to get a quote for a crypto in any supported currency
+#    @from_crypto - chose a crypto currency (eg. BTC, or ETH)
+#    @to_currency - chose a currency to obtain the price in (eg. USD, or CAD)
 #    """
 
 
@@ -106,16 +93,16 @@ async def available_crypto() -> dict:
 @app.get("/update_orderbookdb_asset_price")
 async def update_orderbookdb_asset_price(symbol: str, new_price: float) -> dict:
     """
-    Coded by: <name>  
-    This endpoint allows us to update the price of the assets in the app  
-    @symbol - pick a symbol to update the price of in the orderbook app  
-    @new_price - The new price of the symbol  
+    Coded by: <name>
+    This endpoint allows us to update the price of the assets in the app
+    @symbol - pick a symbol to update the price of in the orderbook app
+    @new_price - The new price of the symbol
     """
-    
+
     # import sqlalchemy
     from sqlalchemy import create_engine, Table, Column, String, DateTime, Numeric, update, MetaData
     from sqlalchemy.orm import sessionmaker
-    
+
     # create an engine for building sessions
     engine = create_engine('mysql+pymysql://wiley:wiley123@orderbookdb/orderbook')
 
@@ -149,15 +136,14 @@ async def update_orderbookdb_asset_price(symbol: str, new_price: float) -> dict:
     finally:
         session.close()
 
-    
+
 # @CODE : ADD ENDPOINT FOR INSERTING A CRYPTO CURRENCY INTO THE ORDERBOOK APP
-# HINT: Make use of the convert_crypto function from above! 
+# HINT: Make use of the convert_crypto function from above!
 #       You will need to use the await keyword to wait for the result (otherwise it will run async and not wait for the result)
 #@app.get("/add_crypto_to_orderbook")
 #async def add_crypto_to_orderbook(symbol: str) -> dict:
 #    """
-#     Coded by: <name>  
-#     This endpoint uses the `convert_crypto` function above to get the price of a crypto-currency  
-#     and inserts that currency and price into the orderbook database 
+#     Coded by: <name>
+#     This endpoint uses the `convert_crypto` function above to get the price of a crypto-currency
+#     and inserts that currency and price into the orderbook database
 #    """
-  
