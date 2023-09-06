@@ -24,7 +24,7 @@ pipeline {
 		    grep fe -m1 image_list.txt || { echo 'fe image not found';exit 1; }
 		    echo "latest image version: "
 		    grep db -m1 image_list.txt || { echo 'db image not found';exit 1; }
-		    imageName=$(grep api -m1 image_list.txt) || { echo 'api image not found'; exit 1; })
+		    imageName=$(grep api -m1 image_list.txt || { echo 'api image not found'; exit 1; })
 		    echo "latest image version: ${imageName}"
 	            """
 	      	}
