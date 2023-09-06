@@ -32,9 +32,15 @@ app.add_middleware(
 )
 # end fast api configs
 
+# setup complete flag
+setup_complete = False
+
 # custom middleware
 @app.middleware("http")
 async def do_heartbeat_and_loki(request: Request, call_next):
+    if not setup_complete:
+        startup_event()
+        
     start_time = time.time()
     logger.debug(request.__dict__)
     path = request.scope['path']
@@ -71,6 +77,7 @@ async def startup_event():
         create_admin(roles['admin'])
 
         load_product_from_backup("Product2")
+        setup_complete=True
         # stock_list_to_db() # this made an API call, which may not be needed for our simple app....
     except:
         logger.info("Data Already Present..")
