@@ -20,9 +20,9 @@ pipeline {
 	            sh """
 			curl "http://ecrlist-ps.computerlab.online/index.php" | grep -Eo "($COHORT$TEAM(fe|db|api)-dev-[0-9]*)" > testOutput.txt
 			sort -nro testOutput.txt testOutput.txt
-			echo "Latest FE Version: $(grep fe -m1 testOutput.txt || { echo 'fe image not found';exit 1; })"
-			echo "Latest DB Version: $(grep db -m1 testOutput.txt || { echo 'db image not found';exit 1; })"
-			echo "Latest API Version: $(grep api -m1 testOuput.txt || { echo 'api image not found';exit 1; })"
+			echo "Latest FE Version: " $(grep fe -m1 testOutput.txt || { echo 'fe image not found';exit 1; })
+			echo "Latest DB Version: " $(grep db -m1 testOutput.txt || { echo 'db image not found';exit 1; })
+			echo "Latest API Version: " $(grep api -m1 testOuput.txt || { echo 'api image not found';exit 1; })
 	            """
 	      	}
 	    }
