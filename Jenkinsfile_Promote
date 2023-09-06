@@ -1,6 +1,6 @@
 pipeline {
   agent {
-    kubernetes {
+c368team04    kubernetes {
         yaml """\
     apiVersion: v1
     kind: Pod
@@ -99,14 +99,14 @@ pipeline {
   environment {
     ECR_REPO = '108174090253.dkr.ecr.us-east-1.amazonaws.com/production-support-course'
 
-    imageAPIDevName='tp001team03api-dev-'
-    imageAPIProdName='tp001team03api-prod-'
-    imageDBDevName='tp001team03db-dev-'
-    imageDBProdName='tp001team03db-prod-'
-    imageFEDevName='tp001team03fe-dev-'
-    imageFEProdName='tp001team03fe-prod-'
+    imageAPIDevName='c368team04api-dev-'
+    imageAPIProdName='c368team04api-prod-'
+    imageDBDevName='c368team04db-dev-'
+    imageDBProdName='c368team04db-prod-'
+    imageFEDevName='c368team04fe-dev-'
+    imageFEProdName='c368team04fe-prod-'
     //imageSSHDevName='c001rickypssh-dev-'
     //imageSSHProdName='c001rickypssh-prod-'
-    projectName='tp001team03'
+    projectName='c368team04'
   }
 }
