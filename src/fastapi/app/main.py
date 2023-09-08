@@ -209,6 +209,10 @@ async def read_num_stocks(
             term: str = "" ) -> dict:
     return {"number_of_stocks":num_stocks(term)}
 
+@app.get("/new_feature")
+async def new_feature(): # devs made a new feature
+    return {"new":"feature"}
+
 
 # should be made to post to verify auth
 @app.get("/stocklist")
