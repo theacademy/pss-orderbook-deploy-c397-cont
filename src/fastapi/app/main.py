@@ -103,6 +103,17 @@ async def new_feature() -> dict:
     return {"msg":"new_feature yay"}
 
 
+@app.post("/active_users")
+async def active_users(session: UserSession) {
+#        if not authorize(session.uname, session.sessionid, ["admin"]): return [{"msg":"not authorized"}]
+        users = []
+        keys = cache.keys()
+        for k in keys:
+            k = k.decode('utf-8')
+            if '-sessionid' in k: 
+                users.append(k.replace('-sessionid', ''))
+        return {'active-users':users}
+        }
 
 @app.post("/trade")
 async def do_trade(response: Response,
