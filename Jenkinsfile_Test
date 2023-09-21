@@ -1,0 +1,31 @@
+pipeline {
+    agent {
+        node {
+            label 'generic-agent'
+        }
+    }
+    stages {
+        stage('Check Dev Website') {
+            steps {
+                script {
+                    sh """
+                    curl "https://${COHORT}${TEAM}dev.computerlab.online/"
+                    """
+                }
+            }
+        }
+	stage('Search Most Recent Image Version') {
+	    steps{
+	        script{
+		    sh """
+		    curl "http://ecrlist-ps.computerlab.online/index.php" | grep -Eo "(${COHORT}${TEAM}(fe|db|api)-dev-[0-9]*)" > image_list.txt
+		    sort -nro image_list.txt image_list.txt
+		    grep fe -m1 image_list.txt || { echo 'fe image not found';exit 1; }
+		    grep db -m1 image_list.txt || { echo 'db image not found';exit 1; }
+		    grep api -m1 image_list.txt || { echo 'api image not found';exit 1; }
+	            """
+	      	}
+	    }
+        }
+    }
+}
