@@ -32,9 +32,15 @@ app.add_middleware(
 )
 # end fast api configs
 
+# setup complete flag
+setup_complete = False
+
 # custom middleware
 @app.middleware("http")
 async def do_heartbeat_and_loki(request: Request, call_next):
+    if not setup_complete:
+        startup_event()
+        
     start_time = time.time()
     logger.debug(request.__dict__)
     path = request.scope['path']
