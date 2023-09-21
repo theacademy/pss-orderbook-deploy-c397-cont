@@ -225,17 +225,17 @@ async def read_tradeable(
 @app.post("/active_users")
 async def do_active_user(
     response: Response,
-    session: UserSession   
-) :
+    session: UserSession):
     
-    if not authorize(session.uname, session.sessionid, ["admin"]): return [{"msg":"not authorized"}]
+    if not authorize(session.uname, session.sessionid, ["admin"]): 
+        return [{"msg":"not authorized"}]
 
     users = []
     keys = cache.keys() # get all keys
     for k in keys:
         k = k.decode('utf-8') # make bytes into string
         # the keys with usernames look like "admin-sessionid"
-        if "-sessionid" in k: #
+        if "-sessionid" in k: 
             users.append(k.replace("-sessionid", "")) # append only the username
 
     return { "active-users" : users }
