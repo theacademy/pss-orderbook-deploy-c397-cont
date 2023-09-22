@@ -48,7 +48,7 @@ async def do_heartbeat_and_loki(request: Request, call_next):
     path = request.scope['path']
     try:
         if not setup_complete:
-        startup_event()
+            startup_event()
         response = await call_next(request)
     except exc.SQLAlchemyError as sqle:
         logger.info("DB ERROR: Trying to create again....")
