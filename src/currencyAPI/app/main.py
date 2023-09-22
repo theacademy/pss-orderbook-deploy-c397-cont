@@ -51,31 +51,16 @@ async def convert_amount(from_currency: str, to_currency: str, amount: float) ->
 #    """
 
 
-# @CODE : ADD ENDPOINT TO LIST ALL AVAILABLE CURRENCIES
+# @CODE : ADD ENDPOINT TO LIST ALL AVAILABLE CURRENCIES  
 # NOTE : FastAPI enforces that the return type of the function matches the function signature!  
 #        This is a common error!
 #@app.get("/available_currencies")
 #async def available_currencies(from_currency: str) -> dict:
 #    """
-#    Coded by: Isabela Pamplona  
+#    Coded by: <name>  
 #    This endpoint returns a list of available fiat currencies that can be paired with the @from_currency parameter.  
 #    @from_currency : str - you must specify a currency to see what currencies it can be compared against.
 #    """
-@app.get("/available_currencies")
-async def available_currencies(from_currency: str) -> dict:
-
-    response = requests.get(f"{API_BASE_URL}{from_currency.upper()}")
-    
-    if response.status_code == 200:
-        data = response.json()
-        available_currencies = list(data["rates"].keys())
-        
-        return {
-            "from_currency": from_currency.upper(),
-            "available_currencies": available_currencies,
-        }
-    else:
-        raise HTTPException(status_code=400, detail="From currency not supported")
 
 
 # @CODE : ADD ENDPOINT TO GET LIST OF CRYPTO CURRENCIES
