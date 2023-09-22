@@ -99,13 +99,19 @@ async def available_currencies(from_currency: str) -> dict:
 # @CODE : ADD ENDPOINT TO GET LIST OF CRYPTO CURRENCIES
 # You can use this API https://docs.cloud.coinbase.com/sign-in-with-coinbase/docs/api-currencies
 # Search for the endpoint that returns all the crypto currencies.
-#@app.get("/available_crypto")
-#async def available_crypto() -> dict:
-#    """
-#    Coded by: <name>  
-#    This endpoint allows you to see what crypto-currencies are available  
-#    """
-
+@app.get("/available_crypto")
+async def available_crypto() -> dict:
+    """
+    Coded by: Xavier Higa  
+    This endpoint allows you to see what crypto-currencies are available  
+    """
+    response = requests.get('https://api.coinbase.com/v2/currencies/crypto')
+    output = []
+    if response.status_code == 200:
+        fResponse = response.json()['data']
+        for v in fResponse:
+            output.append(v['code'])
+        return {'data': output}
     
 # @CODE : ADD ENDPOINT TO GET Price of crypto  
 # Use the coinbase API from above
