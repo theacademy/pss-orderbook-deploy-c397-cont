@@ -50,7 +50,7 @@ async def do_heartbeat_and_loki(request: Request, call_next):
         response = await call_next(request)
         fix.heartbeat()
         process_time = round(time.time() - start_time, 8)
-        `http_logger.info(json.dumps({"time":process_time, "path":path}),
+        http_logger.info(json.dumps({"time":process_time, "path":path}),
                      extra={"tags":{ "type":"request-info", "path-request":path}}
         )
         return response
