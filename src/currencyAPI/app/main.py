@@ -127,9 +127,9 @@ async def convert_crypto(from_crypto: str, to_currency: str) -> dict:
     data = response.json()["data"]
 
     return {
-    "crypto_type": from_crypto.upper(),
-    "price_currency": to_currency.upper(),
-    "price_amount": data["amount"]
+        "crypto_type": from_crypto.upper(),
+        "price_currency": to_currency.upper(),
+        "price_amount": data["amount"] # should it be rounded off to 2 decimal points?
     }
 
 # @CODE : ADD ENDPOINT TO UPDATE PRICE OF ASSET IN ORDERBOOK DB
