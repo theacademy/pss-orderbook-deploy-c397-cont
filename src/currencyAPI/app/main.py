@@ -80,11 +80,21 @@ async def check_password_strength(password: str) -> bool:
 #@app.get("/available_currencies")
 #async def available_currencies(from_currency: str) -> dict:
 #    """
-#    Coded by: <name>  
+#    Coded by: Thea Gregory
 #    This endpoint returns a list of available fiat currencies that can be paired with the @from_currency parameter.  
 #    @from_currency : str - you must specify a currency to see what currencies it can be compared against.
 #    """
 
+@app.get("/available_currencies")
+async def available_currencies(from_currency: str) -> dict:
+    response = requests.get(f"{API_BASE_URL}{from_currency.upper()}") 
+    data = response.json()
+
+    currencies = {
+        from_currency : data["conversion_rates"].keys()
+    }
+
+    return currencies
 
 # @CODE : ADD ENDPOINT TO GET LIST OF CRYPTO CURRENCIES
 # You can use this API https://docs.cloud.coinbase.com/sign-in-with-coinbase/docs/api-currencies
