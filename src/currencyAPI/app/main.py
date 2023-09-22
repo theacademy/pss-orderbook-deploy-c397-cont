@@ -126,14 +126,11 @@ async def convert_crypto(from_crypto: str, to_currency: str) -> dict:
     response = requests.get(f"https://api.coinbase.com/v2/prices/{currency_pair}/buy") 
     data = response.json()["data"]
 
-    exchange_output = {
-        "from_crypto": from_crypto.upper(),
-        "crypto_amount": "BTC",
-        "to_currency": to_currency.upper(),
-        "currency_amount": data["amount"] 
+    return {
+    "crypto_type": from_crypto.upper(),
+    "price_currency": to_currency.upper(),
+    "price_amount": data["amount"]
     }
-
-    return exchange_output
 
 # @CODE : ADD ENDPOINT TO UPDATE PRICE OF ASSET IN ORDERBOOK DB
 # The code below starts you off using SQLAlchemy ORM
