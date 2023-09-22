@@ -41,8 +41,6 @@ setup_complete = False
 # custom middleware
 @app.middleware("http")
 async def do_heartbeat_and_loki(request: Request, call_next):
-    
-        
     start_time = time.time()
     logger.debug(request.__dict__)
     path = request.scope['path']
@@ -50,18 +48,19 @@ async def do_heartbeat_and_loki(request: Request, call_next):
         if not setup_complete:
             startup_event()
         response = await call_next(request)
+        fix.heartbeat()
+        process_time = round(time.time() - start_time, 8)
+        `http_logger.info(json.dumps({"time":process_time, "path":path}),
+                     extra={"tags":{ "type":"request-info", "path-request":path}}
+        )
+        return response
     except exc.SQLAlchemyError as sqle:
         logger.info("DB ERROR: Trying to create again....")
         setup_complete = False
         startup_event()
     except:
         setup_complete = False
-    fix.heartbeat()
-    process_time = round(time.time() - start_time, 8)
-    http_logger.info(json.dumps({"time":process_time, "path":path}),
-                     extra={"tags":{ "type":"request-info", "path-request":path}}
-    )
-    return response
+        startup_event()
 
 # Import modules created for this app
 from app.PostClasses import PostUser, PostTrade, UserSession, UserOrder, UserOrdersReadRequest, UpdateRoles
