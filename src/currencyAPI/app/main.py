@@ -50,6 +50,30 @@ async def convert_amount(from_currency: str, to_currency: str, amount: float) ->
 #    one lowercase letter, one uppercase letter, and is 8 characters long.
 #    """
 
+@app.get("/check_password_strength")
+async def check_password_strength(password: str) -> bool:
+    conditions = {
+        "upper": False,
+        "lower": False,
+        "number": False,
+        "len_8": False
+    }
+    
+    if len(password) >= 8:
+        conditions["len_8"] = True
+
+    for char in password:
+        if char.isupper():
+            conditions["upper"] = True
+        if char.islower():
+            conditions["lower"] = True
+        if char.isnumeric():
+            conditions["number"] = True
+
+    if False in conditions.values():
+        return False
+    else:
+        return True
 
 # @CODE : ADD ENDPOINT TO LIST ALL AVAILABLE CURRENCIES  
 # NOTE : FastAPI enforces that the return type of the function matches the function signature!  
