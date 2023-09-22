@@ -44,6 +44,12 @@ async def convert_amount(from_currency: str, to_currency: str, amount: float) ->
 # Make sure the return type matches the function signature, FastAPI enforces that it does!
 @app.get("/check_password_strength")
 async def check_password_strength(password: str) -> bool:
+#    """
+#    Coded By: Ihovanna
+#    This function checks whether a given password is strong enough, i.e., it contains at least one digit, 
+#    one lowercase letter, one uppercase letter, and is 8 characters long.
+#    """
+
     conditions = {
         "upper": False,
         "lower": False,
@@ -66,13 +72,6 @@ async def check_password_strength(password: str) -> bool:
         return False
     else:
         return True
-#    """
-#    Coded By: Ihovanna
-#    This function checks whether a given password is strong enough, i.e., it contains at least one digit, 
-#    one lowercase letter, one uppercase letter, and is 8 characters long.
-#    """
-
-
 
 # @CODE : ADD ENDPOINT TO LIST ALL AVAILABLE CURRENCIES  
 # NOTE : FastAPI enforces that the return type of the function matches the function signature!  
@@ -113,17 +112,28 @@ async def available_crypto() -> dict:
             output.append(v['code'])
         return {'data': output}
     
-# @CODE : ADD ENDPOINT TO GET Price of crypto  
+# @CODE : ADD ENDPOINT TO GET Price of crypto
 # Use the coinbase API from above
-# @app.get("/convert_crypto")
-# async def convert_crypto(from_crypto: str, to_currency: str) -> dict:
+@app.get("/convert_crypto")
+async def convert_crypto(from_crypto: str, to_currency: str) -> dict:
 #    """
-#    Coded by: <name>  
+#    Coded by: Ihovanna Huezo  
 #    This endpoint allows you to get a quote for a crypto in any supported currency  
 #    @from_crypto - chose a crypto currency (eg. BTC, or ETH)  
 #    @to_currency - chose a currency to obtain the price in (eg. USD, or CAD)  
 #    """
+    currency_pair = f"{from_crypto.upper()}-{to_currency.upper()}"
+    response = requests.get(f"https://api.coinbase.com/v2/prices/{currency_pair}/buy") 
+    data = response.json()["data"]
 
+    exchange_output = {
+        "from_crypto": from_crypto.upper(),
+        "crypto_amount": "BTC",
+        "to_currency": to_currency.upper(),
+        "currency_amount": data["amount"] 
+    }
+
+    return exchange_output
 
 # @CODE : ADD ENDPOINT TO UPDATE PRICE OF ASSET IN ORDERBOOK DB
 # The code below starts you off using SQLAlchemy ORM
