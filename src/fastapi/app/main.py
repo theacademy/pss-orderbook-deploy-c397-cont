@@ -41,12 +41,16 @@ setup_complete = False
 # custom middleware
 @app.middleware("http")
 async def do_heartbeat_and_loki(request: Request, call_next):
+    global setup_complete
     start_time = time.time()
     logger.debug(request.__dict__)
     path = request.scope['path']
+
+    if not setup_complete:
+        startup_event()
+        setup_complete = True
+        
     try:
-        if not setup_complete:
-            startup_event()
         response = await call_next(request)
         fix.heartbeat()
         process_time = round(time.time() - start_time, 8)
@@ -56,11 +60,8 @@ async def do_heartbeat_and_loki(request: Request, call_next):
         return response
     except exc.SQLAlchemyError as sqle:
         logger.info("DB ERROR: Trying to create again....")
-        setup_complete = False
         startup_event()
-    except:
-        setup_complete = False
-        startup_event()
+        setup_complete = True
 
 # Import modules created for this app
 from app.PostClasses import PostUser, PostTrade, UserSession, UserOrder, UserOrdersReadRequest, UpdateRoles
@@ -82,10 +83,10 @@ async def startup_event():
     wait_mysql()
     create_tables()
     try:
-        # create_roles will throw error if DB is already setup
+         # create_roles will throw error if DB is already setup
         roles = create_roles()
         create_admin(roles['admin'])
-
+    
         load_product_from_backup("Product2")
         # stock_list_to_db() # this made an API call, which may not be needed for our simple app....
     except:
