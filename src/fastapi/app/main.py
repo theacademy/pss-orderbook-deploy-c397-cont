@@ -51,7 +51,7 @@ async def do_heartbeat_and_loki(request: Request, call_next):
         response = await call_next(request)
     except exc.SQLAlchemyError as sqle:
         logger.info("DB ERROR: Trying to create again....")
-        steup_complete = False
+        setup_complete = False
         startup_event()
     fix.heartbeat()
     process_time = round(time.time() - start_time, 8)
