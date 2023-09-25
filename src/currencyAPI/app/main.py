@@ -84,7 +84,7 @@ async def check_password_strength(password: str) -> bool:
     @from_currency : str - you must specify a currency to see what currencies it can be compared against.
     """
 
-@app.get("/c")
+@app.get("/available_currencies")
 async def available_currencies(from_currency: str) -> dict:
     response = requests.get(f"{API_BASE_URL}{from_currency.upper()}") 
     data = response.json()
