@@ -201,7 +201,7 @@ async def add_crypto_to_orderbook(symbol: str) -> dict:
      This endpoint uses the `convert_crypto` function above to get the price of a crypto-currency  
      and inserts that currency and price into the orderbook database 
     """
-    from sqlalchemy import create_engine, Table, Column, String, DateTime, Numeric, , MetaData
+    from sqlalchemy import create_engine, Table, Column, String, DateTime, Numeric, MetaData
     from sqlalchemy.orm import sessionmaker
     
     # create an engine for building sessions
