@@ -194,29 +194,29 @@ async def update_orderbookdb_asset_price(symbol: str, new_price: float) -> dict:
 #     This endpoint uses the `convert_crypto` function above to get the price of a crypto-currency  
 #     and inserts that currency and price into the orderbook database 
 #    """
-@app.get("/add_crypto_to_orderbook")
-async def add_crypto_to_orderbook(symbol: str) -> dict:
-    """
-     Coded by: <name>  
-     This endpoint uses the `convert_crypto` function above to get the price of a crypto-currency  
-     and inserts that currency and price into the orderbook database 
-    """
-    from sqlalchemy import create_engine, Table, Column, String, DateTime, Numeric, MetaData
-    from sqlalchemy.orm import sessionmaker
-    
-    # create an engine for building sessions
-    engine = create_engine('mysql+pymysql://wiley:wiley123@orderbookdb/orderbook')
-
-    # create an ORM object that maps to the Product table
-    metadata = MetaData()
-    product_table = Table('Product', metadata,
-        Column('symbol', String(16), primary_key=True),
-        Column('price', Numeric(precision=15, scale=2)),
-        Column('productType', String(12)),
-        Column('name', String(128)),
-        Column('lastUpdate', DateTime)
-    )
-    metadata.create_all(engine)
+# @app.get("/add_crypto_to_orderbook")
+# async def add_crypto_to_orderbook(symbol: str) -> dict:
+#    """
+#     Coded by: <name>  
+#     This endpoint uses the `convert_crypto` function above to get the price of a crypto-currency  
+#     and inserts that currency and price into the orderbook database 
+#    """
+#    from sqlalchemy import create_engine, Table, Column, String, DateTime, Numeric, MetaData
+#    from sqlalchemy.orm import sessionmaker
+#    
+#    # create an engine for building sessions
+#    engine = create_engine('mysql+pymysql://wiley:wiley123@orderbookdb/orderbook')#
+#
+#    # create an ORM object that maps to the Product table
+#    metadata = MetaData()
+#    product_table = Table('Product', metadata,
+#        Column('symbol', String(16), primary_key=True),
+#        Column('price', Numeric(precision=15, scale=2)),
+#        Column('productType', String(12)),
+#        Column('name', String(128)),
+#        Column('lastUpdate', DateTime)
+#    )
+#    metadata.create_all(engine)
 
     # create a database session maker
     Session = sessionmaker(bind=engine)
