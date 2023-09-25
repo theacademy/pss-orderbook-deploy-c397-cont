@@ -44,11 +44,11 @@ async def convert_amount(from_currency: str, to_currency: str, amount: float) ->
 # Make sure the return type matches the function signature, FastAPI enforces that it does!
 @app.get("/check_password_strength")
 async def check_password_strength(password: str) -> bool:
-#    """
-#    Coded By: Ihovanna
-#    This function checks whether a given password is strong enough, i.e., it contains at least one digit, 
-#    one lowercase letter, one uppercase letter, and is 8 characters long.
-#    """
+   """
+   Coded By: Ihovanna Huezo 
+   This function checks whether a given password is strong enough, i.e., it contains at least one digit, 
+   one lowercase letter, one uppercase letter, and is 8 characters long.
+   """
 
     conditions = {
         "upper": False,
@@ -76,21 +76,19 @@ async def check_password_strength(password: str) -> bool:
 # @CODE : ADD ENDPOINT TO LIST ALL AVAILABLE CURRENCIES  
 # NOTE : FastAPI enforces that the return type of the function matches the function signature!  
 #        This is a common error!
-#@app.get("/available_currencies")
-#async def available_currencies(from_currency: str) -> dict:
+
+@app.get("/available_currencies")
+async def available_currencies(from_currency: str) -> dict:
     """
     Coded by: Thea Gregory
     This endpoint returns a list of available fiat currencies that can be paired with the @from_currency parameter.  
     @from_currency : str - you must specify a currency to see what currencies it can be compared against.
     """
-
-@app.get("/available_currencies")
-async def available_currencies(from_currency: str) -> dict:
     response = requests.get(f"{API_BASE_URL}{from_currency.upper()}") 
     data = response.json()
 
     currencies = {
-        from_currency : data["conversion_rates"].keys()
+        from_currency : data["rates"].keys()
     }
 
     return currencies
@@ -116,12 +114,12 @@ async def available_crypto() -> dict:
 # Use the coinbase API from above
 @app.get("/convert_crypto")
 async def convert_crypto(from_crypto: str, to_currency: str) -> dict:
-#    """
-#    Coded by: Ihovanna Huezo  
-#    This endpoint allows you to get a quote for a crypto in any supported currency  
-#    @from_crypto - chose a crypto currency (eg. BTC, or ETH)  
-#    @to_currency - chose a currency to obtain the price in (eg. USD, or CAD)  
-#    """
+   """
+   Coded by: Ihovanna Huezo  
+   This endpoint allows you to get a quote for a crypto in any supported currency  
+   @from_crypto - chose a crypto currency (eg. BTC, or ETH)  
+   @to_currency - chose a currency to obtain the price in (eg. USD, or CAD)  
+   """
     currency_pair = f"{from_crypto.upper()}-{to_currency.upper()}"
     response = requests.get(f"https://api.coinbase.com/v2/prices/{currency_pair}/buy") 
     data = response.json()["data"]
