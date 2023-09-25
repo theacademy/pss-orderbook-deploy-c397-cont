@@ -62,6 +62,14 @@ async def do_heartbeat_and_loki(request: Request, call_next):
         logger.info("DB ERROR: Trying to create again....")
         startup_event()
         setup_complete = True
+        response = await call_next(request)
+        fix.heartbeat()
+        process_time = round(time.time() - start_time, 8)
+        http_logger.info(json.dumps({"time":process_time, "path":path}),
+                     extra={"tags":{ "type":"request-info", "path-request":path}}
+        )
+        return response
+        
 
 # Import modules created for this app
 from app.PostClasses import PostUser, PostTrade, UserSession, UserOrder, UserOrdersReadRequest, UpdateRoles
