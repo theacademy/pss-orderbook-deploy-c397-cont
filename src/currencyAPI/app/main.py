@@ -90,7 +90,7 @@ async def available_currencies(from_currency: str) -> dict:
     for k in data['rates'].keys():
         output.append(k)
     currencies = {
-        from_currency : data["conversion_rates"].keys()
+        from_currency : output
     }
 
     return currencies
