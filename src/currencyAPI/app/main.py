@@ -90,7 +90,7 @@ async def available_currencies(from_currency: str) -> dict:
     data = response.json()
 
     currencies = {
-        from_currency : data["conversion_rates"].keys()
+        from_currency : data["rates"].keys()
     }
 
     return currencies
