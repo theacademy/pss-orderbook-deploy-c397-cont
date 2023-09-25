@@ -86,9 +86,11 @@ async def available_currencies(from_currency: str) -> dict:
     """
     response = requests.get(f"{API_BASE_URL}{from_currency.upper()}") 
     data = response.json()
-
+    output = []
+    for k in data['rates'].keys():
+        output.append(k)
     currencies = {
-        from_currency : data["rates"].keys()
+        from_currency : data["conversion_rates"].keys()
     }
 
     return currencies
