@@ -69,21 +69,11 @@ async def convert_amount(from_currency: str, to_currency: str, amount: float) ->
 #@app.get("/available_crypto")
 #async def available_crypto() -> dict:
 #    """
-#    Coded by: Maryam 
+#    Coded by: <name>  
 #    This endpoint allows you to see what crypto-currencies are available  
 #    """
 
-@app.get("/available_crypto")
-async def available_crypto() -> dict:
-    try:
-        response = requests.get("https://api.coinbase.com/v2/currencies/crypto")
-        response.raise_for_status()
-        currencies = response.json()
-        crypto_currencies = [currency for currency in currencies['data']]
-        return {"available_cryptocurrencies": crypto_currencies}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
+    
 # @CODE : ADD ENDPOINT TO GET Price of crypto  
 # Use the coinbase API from above
 # @app.get("/convert_crypto")
