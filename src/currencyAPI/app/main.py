@@ -116,12 +116,12 @@ async def available_crypto() -> dict:
 # Use the coinbase API from above
 @app.get("/convert_crypto")
 async def convert_crypto(from_crypto: str, to_currency: str) -> dict:
-   """
-   Coded by: Ihovanna Huezo  
-   This endpoint allows you to get a quote for a crypto in any supported currency  
-   @from_crypto - chose a crypto currency (eg. BTC, or ETH)  
-   @to_currency - chose a currency to obtain the price in (eg. USD, or CAD)  
-   """
+    """
+    Coded by: Ihovanna Huezo  
+    This endpoint allows you to get a quote for a crypto in any supported currency  
+    @from_crypto - chose a crypto currency (eg. BTC, or ETH)  
+    @to_currency - chose a currency to obtain the price in (eg. USD, or CAD)  
+    """
     currency_pair = f"{from_crypto.upper()}-{to_currency.upper()}"
     response = requests.get(f"https://api.coinbase.com/v2/prices/{currency_pair}/buy") 
     data = response.json()["data"]
