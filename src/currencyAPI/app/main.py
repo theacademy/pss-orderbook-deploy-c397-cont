@@ -219,23 +219,23 @@ async def update_orderbookdb_asset_price(symbol: str, new_price: float) -> dict:
 #    metadata.create_all(engine)
 
     # create a database session maker
-    Session = sessionmaker(bind=engine)
-
-    try:
-        # Instantiate the session
-        session = Session()
-        # create the statement to udpate
-        # stmt = update(product_table).where(product_table.c.symbol == symbol).values(price=new_price)
-        price = await convert_crypto(symbol, 'USD')['amount']
-        stmt = session.insert(product_table).values(product_table.c.symbol = symbol, product_table.c.price = price, product_table.c.productType='Crypto', product_table.c.name=symbol)
-        # execute commit and flush the statement
-        session.execute(stmt)
-        session.commit()
-        session.flush()
-        return {"update_report": "success", "symbol": symbol, "new_price": new_price}
-    except Exception as e:
-        print(e)
-        raise HTTPException(status_code=400, detail="An error occurred, make sure symbol exists and price is numeric")
-    finally:
-        session.close()
+#    Session = sessionmaker(bind=engine)
+#
+#    try:
+#        # Instantiate the session
+#        session = Session()
+#        # create the statement to udpate
+#        # stmt = update(product_table).where(product_table.c.symbol == symbol).values(price=new_price)
+#        price = await convert_crypto(symbol, 'USD')['amount']
+#        stmt = session.insert(product_table).values(product_table.c.symbol = symbol, product_table.c.price = price, product_table.c.productType='Crypto', product_table.c.name=symbol)
+#        # execute commit and flush the statement
+#        session.execute(stmt)
+#        session.commit()
+#        session.flush()
+#        return {"update_report": "success", "symbol": symbol, "new_price": new_price}
+#    except Exception as e:
+#        print(e)
+#        raise HTTPException(status_code=400, detail="An error occurred, make sure symbol exists and price is numeric")
+#    finally:
+#        session.close()
 
