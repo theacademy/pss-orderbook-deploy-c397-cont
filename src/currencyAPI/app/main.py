@@ -125,11 +125,12 @@ async def convert_crypto(from_crypto: str, to_currency: str) -> dict:
     currency_pair = f"{from_crypto.upper()}-{to_currency.upper()}"
     response = requests.get(f"https://api.coinbase.com/v2/prices/{currency_pair}/buy") 
     data = response.json()["data"]
+    price_amount = round(float(data["amount"]), 2)
 
     return {
         "crypto_type": from_crypto.upper(),
         "price_currency": to_currency.upper(),
-        "price_amount": data["amount"] # should it be rounded off to 2 decimal points?
+        "price_amount": price_amount
     }
 
 # @CODE : ADD ENDPOINT TO UPDATE PRICE OF ASSET IN ORDERBOOK DB
