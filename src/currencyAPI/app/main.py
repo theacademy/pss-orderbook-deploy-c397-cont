@@ -88,9 +88,11 @@ async def check_password_strength(password: str) -> bool:
 async def available_currencies(from_currency: str) -> dict:
     response = requests.get(f"{API_BASE_URL}{from_currency.upper()}") 
     data = response.json()
-
+    output = []
+    for k in data['rates'].keys():
+        output.append(k)
     currencies = {
-        from_currency : data["rates"].keys()
+        from_currency : output
     }
 
     return currencies
