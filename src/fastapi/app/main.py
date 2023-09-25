@@ -6,6 +6,8 @@ import asyncio
 import json
 import time
 
+from fastapi.responses import JSONResponse
+
 # import sqlalchemy errors
 from sqlalchemy import exc
 
@@ -62,13 +64,7 @@ async def do_heartbeat_and_loki(request: Request, call_next):
         logger.info("DB ERROR: Trying to create again....")
         startup_event()
         setup_complete = True
-        response = await call_next(request)
-        fix.heartbeat()
-        process_time = round(time.time() - start_time, 8)
-        http_logger.info(json.dumps({"time":process_time, "path":path}),
-                     extra={"tags":{ "type":"request-info", "path-request":path}}
-        )
-        return response
+        return JSONResponse(status_code=500)
         
 
 # Import modules created for this app
