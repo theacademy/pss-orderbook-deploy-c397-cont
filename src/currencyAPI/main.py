@@ -5,6 +5,7 @@ app = FastAPI()
 
 API_BASE_URL = "https://api.exchangerate-api.com/v4/latest/"
 
+# This is a random comment.
 
 async def get_exchange_rate(from_currency: str, to_currency: str) -> float:
     response = requests.get(f"{API_BASE_URL}{from_currency.upper()}") 
