@@ -26,12 +26,6 @@ jobs:
       - name: Print Directory
         run: echo ${{ github.workspace }}
 
-      - name: Docker Setup (I think)
-        uses: docker/metadata-action@v4
-        id: metadata
-        with:
-          images: ${{ steps.login-ecr.outputs.registry }}/${{ github.repository }}
-
       - name: Build and Publish Front End
         id: build-img-fe
         env:
@@ -39,10 +33,11 @@ jobs:
           ECR_REPOSITORY: ${{ secrets.REPO_NAME }}
           IMAGE_TAG: latest
           BRANCH: 'c368team03'
-          TAG: "c368team03fe-dev-$IMAGE_TAG"
+          TAG: "c368team03fe-dev-test"
         run: |
           echo "Testing building here."
           echo "${{github.workspace}}/Dockerfiles/Dockerfile_nginx"
-          echo "$ECR_REPOSITORY:c368team03fe-dev-test"
-          docker build --file ${{github.workspace}}/Dockerfiles/Dockerfile_nginx --tag $ECR_REPOSITORY:c368team03fe-dev-test
-          docker push $ECR_REPOSITORY:c368team03fe-dev-test
+          echo "$TAG"
+          docker build -f ${{github.workspace}}/Dockerfiles/Dockerfile_nginx -t $ECR_REGISTRY/$ECR_REPOSITORY:$TAG .
+          echo "We got here!"
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$TAG
