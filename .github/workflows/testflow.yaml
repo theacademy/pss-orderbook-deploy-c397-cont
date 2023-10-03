@@ -30,7 +30,7 @@ jobs:
         id: build-img-fe
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: ${{ secrets.REPO_NAME }}
+          ECR_REPOSITORY: "ecrlist-ps.computerlab.online"
           IMAGE_TAG: latest
           BRANCH: 'c368team03'
           TAG: "c368team03fe-dev-test"
