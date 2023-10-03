@@ -4,38 +4,38 @@ on:
     branches:
       - 'c368team03'
 jobs:
-  test-build2:
+  test-build-again:
     name: Test Build Two
     runs-on: ubuntu-latest
 
-  steps:
-    - name: Checkout
-      uses: actions/checkout@v3
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
 
-    - name: Configure AWS Credentials
-      uses: aws-actions/configure-aws-credentials@v1
-      with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: us-east-2
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-2
 
-    - name: Login to Amazon ECR
-      id: login-ecr
-      uses: aws-actions/amazon-ecr-login@v1
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
 
-    - name: Build and Publish Front End
-      id: build-img-fe
-      env:
-        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        ECR_REPOSITORY: ${{ secrets.REPO_NAME }}
-        IMAGE_TAG: latest
-        BRANCH: 'c368team03'
-      run: |
-        echo "Testing build."
-        echo $ECR_REGISTRY
-        echo $ECR_REPOSITORY
-        echo $IMAGE_TAG
-        echo $BRANCH
-        /kaniko/.docker/config.json
-        /kaniko/executor -f `pwd`/Dockerfiles/Dockerfile_mysql -c `pwd` --insecure --skip-tls-verify --cache=false --destination=$ECR_REPOSITORY:$IMAGE_TAG
+      - name: Build and Publish Front End
+        id: build-img-fe
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: ${{ secrets.REPO_NAME }}
+          IMAGE_TAG: latest
+          BRANCH: 'c368team03'
+        run: |
+          echo "Testing build."
+          echo $ECR_REGISTRY
+          echo $ECR_REPOSITORY
+          echo $IMAGE_TAG
+          echo $BRANCH
+          /kaniko/.docker/config.json
+          /kaniko/executor -f `pwd`/Dockerfiles/Dockerfile_mysql -c `pwd` --insecure --skip-tls-verify --cache=false --destination=$ECR_REPOSITORY:$IMAGE_TAG
 
