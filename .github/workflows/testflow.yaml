@@ -1,0 +1,13 @@
+name: test2
+on:
+  push:
+    branches: 
+      - 'c368team03'
+jobs:
+  test-workflow:
+    name: Testing
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Testing
+        run: echo "This is a test"
