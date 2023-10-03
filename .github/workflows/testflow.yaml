@@ -41,5 +41,5 @@ jobs:
           BRANCH: 'c368team03'
         run: |
           echo "Testing building here."
-          docker build --file ${{github.workspace}}/Dockerfiles/Dockerfile_ngix -tag $ECR_REGISTRY/$ECR_REPOSITORY:$BRANCHfe-dev-$IMAGE_TAG
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$BRANCHfe-dev-$IMAGE_TAG
+          echo "${{github.workspace}}/Dockerfiles/Dockerfile_ngix"
+          docker build --file ${{github.workspace}}/Dockerfiles/Dockerfile_ngix -tag $BRANCHfe-dev-$IMAGE_TAG --destination=$ECR_REPOSITORY:c368team03fe-dev-$IMAGE_TAG
