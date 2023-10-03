@@ -23,6 +23,12 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
 
+      - name: Docker Setup (I think)
+        uses: docker/metadata-action@v4
+        id: metadata
+        with:
+          images: ${{ steps.login-ecr.outputs.registry }}/${{ github.repository }}
+
       - name: Build and Publish Front End
         id: build-img-fe
         env:
@@ -30,12 +36,8 @@ jobs:
           ECR_REPOSITORY: ${{ secrets.REPO_NAME }}
           IMAGE_TAG: latest
           BRANCH: 'c368team03'
-        run: |
-          echo "Testing build."
-          echo $ECR_REGISTRY
-          echo $ECR_REPOSITORY
-          echo $IMAGE_TAG
-          echo $BRANCH
-          /kaniko/.docker/config.json
-          /kaniko/executor -f `pwd`/Dockerfiles/Dockerfile_mysql -c `pwd` --insecure --skip-tls-verify --cache=false --destination=$ECR_REPOSITORY:$IMAGE_TAG
-
+        uses: int128/kaniko-action@v1
+        with:
+          push: true
+          tags: ${{ steps.metadata.outputs.tags }}
+          labels: ${{ steps.metadata.outputs.labels }}
