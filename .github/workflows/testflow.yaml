@@ -39,10 +39,7 @@ jobs:
           ECR_REPOSITORY: ${{ secrets.REPO_NAME }}
           IMAGE_TAG: latest
           BRANCH: 'c368team03'
-        uses: int128/kaniko-action@v1
-        with:
-          push: true
-          tags: ${{ steps.metadata.outputs.tags }}
-          labels: ${{ steps.metadata.outputs.labels }}
-          context: ${{ github.workspace }}/Dockerfiles
-          file: Dockerfile_ngnix
+        run: |
+          echo "Testing building here."
+        docker build --file ${{github.workspace}}/Dockerfiles/Dockerfile_ngix -tag $ECR_REGISTRY/$ECR_REPOSITORY:$BRANCHfe-dev-$IMAGE_TAG
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$BRANCHfe-dev-$IMAGE_TAG
