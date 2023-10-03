@@ -44,4 +44,4 @@ jobs:
           push: true
           tags: ${{ steps.metadata.outputs.tags }}
           labels: ${{ steps.metadata.outputs.labels }}
-          file: ${{ github.workspace }}/Dockerfiles/Dockerfile_ngnix
+          executor: [ --dockerfile ${{ github.workspace }}/Dockerfiles/Dockerfile_ngnix]
