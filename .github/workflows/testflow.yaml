@@ -38,6 +38,6 @@ jobs:
           echo "Testing building here."
           echo "${{github.workspace}}/Dockerfiles/Dockerfile_nginx"
           echo "$TAG"
-          docker build -f ${{github.workspace}}/Dockerfiles/Dockerfile_nginx -t $TAG .
+          docker build -f ${{github.workspace}}/Dockerfiles/Dockerfile_nginx -t $ECR_REGISTRY/$ECR_REPOSITORY:$TAG .
           echo "We got here!"
-          docker push $TAG
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$TAG
