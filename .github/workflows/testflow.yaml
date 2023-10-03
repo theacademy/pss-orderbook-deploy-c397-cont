@@ -44,5 +44,5 @@ jobs:
           echo "Testing building here."
           echo "${{github.workspace}}/Dockerfiles/Dockerfile_ngix"
           echo "$ECR_REPOSITORY:c368team03fe-dev-$IMAGE_TAG"
-          docker build --file "${{github.workspace}}/Dockerfiles/Dockerfile_ngix" -tag $TAG
+          docker build --file "${{github.workspace}}/Dockerfiles/Dockerfile_nginx" -tag $TAG
           docker push "$ECR_REPOSITORY:c368team03fe-dev-$IMAGE_TAG"
