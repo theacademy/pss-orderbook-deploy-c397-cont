@@ -31,6 +31,7 @@ jobs:
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: "production-support-course"
+          ECR_RR: "108174090253.dkr.ecr.us-east-1.amazonaws.com/production-support-course"
           IMAGE_TAG: latest
           BRANCH: 'c368team03'
           TAG: "c368team03fe-dev-test"
@@ -38,6 +39,6 @@ jobs:
           echo "Testing building here."
           echo "${{github.workspace}}/Dockerfiles/Dockerfile_nginx"
           echo "$TAG"
-          docker build -f ${{github.workspace}}/Dockerfiles/Dockerfile_nginx -t $ECR_REGISTRY/$ECR_REPOSITORY:$TAG .
+          docker build -f ${{github.workspace}}/Dockerfiles/Dockerfile_nginx -t $ECR_RR:$TAG .
           echo "We got here!"
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$TAG
+          docker push $ECR_RR:$TAG
