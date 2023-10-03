@@ -42,4 +42,4 @@ jobs:
         run: |
           echo "Testing building here."
           echo "${{github.workspace}}/Dockerfiles/Dockerfile_ngix"
-          docker build --file ${{github.workspace}}/Dockerfiles/Dockerfile_ngix -tag $BRANCHfe-dev-$IMAGE_TAG --destination=$ECR_REPOSITORY:c368team03fe-dev-$IMAGE_TAG
+          docker build --file '${{github.workspace}}/Dockerfiles/Dockerfile_ngix' -tag '$BRANCHfe-dev-$IMAGE_TAG' --destination= '$ECR_REPOSITORY:c368team03fe-dev-$IMAGE_TAG'
