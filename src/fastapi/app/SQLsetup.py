@@ -1,3 +1,4 @@
+import os
 import pandas as pd
 from app.SQLClasses import *
 from sqlalchemy.dialects.postgresql import insert
@@ -8,11 +9,14 @@ import logging
 
 
 
+
+
+
 logger = logging.getLogger('general')
 
 def mysql_conn_str(
     uname="wiley",
-    password="wiley123", # should use env variables or docker secrets....
+    password=os.environ["mysql-db"], # should use env variables or docker secrets....
     host="orderbookdb",
     db="orderbook"
 ):
