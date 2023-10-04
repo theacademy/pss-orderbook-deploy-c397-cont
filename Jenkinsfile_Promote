@@ -108,5 +108,6 @@ pipeline {
     //imageSSHDevName='c001rickypssh-dev-'
     //imageSSHProdName='c001rickypssh-prod-'
     projectName='c368team03'
+
   }
 }

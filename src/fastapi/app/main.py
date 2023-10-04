@@ -11,7 +11,6 @@ from fastapi.responses import JSONResponse
 # import sqlalchemy errors
 from sqlalchemy import exc
 
-#Just a test.
 
 # setup logging
 import logging
