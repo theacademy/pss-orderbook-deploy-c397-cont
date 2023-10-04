@@ -17,7 +17,7 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          role-to-assume: arn:aws:iam::108174090253:role/eks-sre-course/svcacct/JenkinsAgent
+          role-to-assume: arn:aws:iam::108174090253:role/gh_jenkins_copy
           aws-region: us-east-2
 
       - name: Login to Amazon ECR
