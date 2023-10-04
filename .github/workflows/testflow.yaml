@@ -35,7 +35,7 @@ jobs:
           ADDHTTP: "https:"
           IMAGE_TAG: latest
           BRANCH: 'c368team03'
-          TAG: "c368team03fe-dev-test"
+          TAG: "c368team03fe-dev-${{github.run_attempt}}"
         run: |
           echo "Testing building here."
           echo "${{github.workspace}}/Dockerfiles/Dockerfile_nginx"
