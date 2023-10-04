@@ -31,6 +31,10 @@ jobs:
           Write-Host "::set-output name=fe_changed::$feHasDif"
           Write-Host "::set-output name=db_changed::$dbHasDif"
           Write-Host "::set-output name=api_changed::$apiHasDif"
+          echo "currencyAPI changed = $cHasDif"
+          echo "FE changed = $feHasDif"
+          echo "DB changed = $dbHasDif"
+          echo "API changed = $apiHasDif"
 
 
 
