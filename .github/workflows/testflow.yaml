@@ -17,7 +17,7 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-2
+          aws-region: us-east-1
 
       - name: Login to Amazon ECR
         id: login-ecr
@@ -42,4 +42,4 @@ jobs:
           echo "$TAG"
           docker build -f ${{github.workspace}}/Dockerfiles/Dockerfile_nginx -t $ECR_RR:$TAG .
           echo "We got here!"
-          docker push $ADDHTTP//$ECR_RR:$TAG
+          docker push $ECR_RR:$TAG
