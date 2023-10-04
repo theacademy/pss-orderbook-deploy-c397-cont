@@ -22,8 +22,6 @@ jobs:
       - name: Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
-        with:
-          role-to-assume: arn:aws:iam::108174090253:role/gh_jenkins_copy
 
       - name: Print Directory
         run: echo ${{ github.workspace }}
@@ -33,7 +31,7 @@ jobs:
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: "production-support-course"
-          ECR_RR: "108174090253.dkr.ecr.us-east-1.amazonaws.com/production-support-course"
+          ECR_RR: "https://108174090253.dkr.ecr.us-east-1.amazonaws.com/production-support-course"
           IMAGE_TAG: latest
           BRANCH: 'c368team03'
           TAG: "c368team03fe-dev-test"
