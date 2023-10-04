@@ -23,23 +23,52 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
 
-      - name: Print Directory
-        run: echo ${{ github.workspace }}
+      - name: Print Run ID
+        run: echo ${{ github.run_id }}
 
-      - name: Build and Publish Front End
+      - name: Build and Push Front End
         id: build-img-fe
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: "production-support-course"
           ECR_RR: "108174090253.dkr.ecr.us-east-1.amazonaws.com/production-support-course"
-          ADDHTTP: "https:"
-          IMAGE_TAG: latest
           BRANCH: 'c368team03'
-          TAG: "c368team03fe-dev-${{github.run_attempt}}"
+          TAG: "c368team03fe-dev-${{github.run_id}}"
         run: |
-          echo "Testing building here."
-          echo "${{github.workspace}}/Dockerfiles/Dockerfile_nginx"
-          echo "$TAG"
+          echo "Building FE"
           docker build -f ${{github.workspace}}/Dockerfiles/Dockerfile_nginx -t $ECR_RR:$TAG .
-          echo "We got here!"
+          echo "Pushing IMG to ECR"
+          docker push $ECR_RR:$TAG
+
+      - name: Build and Push DB
+        id: build-img-db
+        env:
+          ECR_RR: "108174090253.dkr.ecr.us-east-1.amazonaws.com/production-support-course"
+          TAG: "c368team03db-dev-${{github.run_id}}"
+        run: |
+          echo "Building DB"
+          docker build -f ${{github.workspace}}/Dockerfiles/Dockerfile_mysql -t $ECR_RR:$TAG .
+          echo "Pushing IMG to ECR"
+          docker push $ECR_RR:$TAG
+
+      - name: Build and Push currencyAPI
+        id: build-img-currencyapi
+        env:
+          ECR_RR: "108174090253.dkr.ecr.us-east-1.amazonaws.com/production-support-course"
+          TAG: "c368team03currency-api-dev-${{github.run_id}}"
+        run: |
+          echo "Building CurrencyAPI"
+          docker build -f ${{github.workspace}}/Dockerfiles/Dockerfile_currencyAPI -t $ECR_RR:$TAG .
+          echo "Pushing IMG to ECR"
+          docker push $ECR_RR:$TAG
+
+      - name: Build and Push API
+        id: build-img-api
+        env:
+          ECR_RR: "108174090253.dkr.ecr.us-east-1.amazonaws.com/production-support-course"
+          TAG: "c368team03api-dev-${{github.run_id}}"
+        run: |
+          echo "Building API"
+          docker build -f ${{github.workspace}}/Dockerfiles/Dockerfile_fastapi -t $ECR_RR:$TAG .
+          echo "Pushing IMG to ECR"
           docker push $ECR_RR:$TAG
