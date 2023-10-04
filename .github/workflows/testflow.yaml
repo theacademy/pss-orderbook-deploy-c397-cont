@@ -22,11 +22,11 @@ jobs:
           echo "$diff"
           $currencyAPIDiff = $diff | Where-Object { $_ -match '^src/currencyAPI/' -or $_ -match '.md$' }
           $cHasDif = $currencyAPIDiff.Length -gt 0
-          $feDiff = $diff | Where-Object { $_ -match '^nginx/' -or $_ -match '.md$' }
+          $feDiff = $diff | Where-Object { $_ -match '^src/nginx/' -or $_ -match '.md$' }
           $feHasDif = $feDiff.Length -gt 0
-          $dbDiff = $diff | Where-Object { $_ -match '^mysql/' -or $_ -match '.md$' }
+          $dbDiff = $diff | Where-Object { $_ -match '^src/mysql/' -or $_ -match '.md$' }
           $dbHasDif = $dbDiff.Length -gt 0
-          $apiDiff = $diff | Where-Object {$_ -match '^fastapi/' -or $_ -match '.md$' }
+          $apiDiff = $diff | Where-Object {$_ -match '^src/fastapi/' -or $_ -match '.md$' }
           $apiHasDif = $apiDiff.Length -gt 0
           Write-Host "::set-output name=capi_changed::$cHasDif"
           Write-Host "::set-output name=fe_changed::$feHasDif"
