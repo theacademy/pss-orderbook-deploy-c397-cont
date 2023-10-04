@@ -1,4 +1,0 @@
-This is just
-a text file
-to see if this 
-triggers a build for fastapi.
