@@ -1,11 +1,11 @@
-name: testflow
+name: devPipeline
 on:
   push:
     branches:
       - 'c368team03'
 jobs:
-  test-build-again:
-    name: Test Build Two
+  dev-commit-triggered-conditional-builds:
+    name: Full Commit Triggered Conditional Builds
     runs-on: ubuntu-latest
 
     steps:
