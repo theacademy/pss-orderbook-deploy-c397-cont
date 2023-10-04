@@ -20,7 +20,7 @@ jobs:
         run: |
           $diff = git diff --name-only HEAD^ HEAD
           echo "$diff"
-          $currencyAPIDiff = $diff | Where-Object { $_ -match '^currencyAPI/' -or $_ -match '.md$' }
+          $currencyAPIDiff = $diff | Where-Object { $_ -match '^src/currencyAPI/' -or $_ -match '.md$' }
           $cHasDif = $currencyAPIDiff.Length -gt 0
           $feDiff = $diff | Where-Object { $_ -match '^nginx/' -or $_ -match '.md$' }
           $feHasDif = $feDiff.Length -gt 0
