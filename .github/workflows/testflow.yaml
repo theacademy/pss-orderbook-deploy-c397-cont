@@ -32,7 +32,7 @@ jobs:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: "production-support-course"
           ECR_RR: "108174090253.dkr.ecr.us-east-1.amazonaws.com/production-support-course"
-          ADDHTTP: "https://"
+          ADDHTTP: "https:"
           IMAGE_TAG: latest
           BRANCH: 'c368team03'
           TAG: "c368team03fe-dev-test"
@@ -42,4 +42,4 @@ jobs:
           echo "$TAG"
           docker build -f ${{github.workspace}}/Dockerfiles/Dockerfile_nginx -t $ECR_RR:$TAG .
           echo "We got here!"
-          docker push $ADDHTTP$ECR_RR:$TAG
+          docker push $ADDHTTP//$ECR_RR:$TAG
