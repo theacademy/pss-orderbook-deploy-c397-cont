@@ -16,7 +16,7 @@ logger = logging.getLogger('general')
 
 def mysql_conn_str(
     uname="wiley",
-    password=os.environ["mysql-db"], # should use env variables or docker secrets....
+    password=os.environ["team03-secret"], # should use env variables or docker secrets....
     host="orderbookdb",
     db="orderbook"
 ):
