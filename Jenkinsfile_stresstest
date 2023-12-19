@@ -49,7 +49,7 @@ pipeline {
                 echo "Image FE Prod Name: ${imageFEProdName}"
 
                 # Step 1: List all images
-                apiDevTags=$(aws ecr list-images --repository-name ${ecrname} --query 'imageIds[?contains(imageTag, '${imageAPIDevName}'].imageTag' --output text)
+                apiDevTags=$(aws ecr list-images --repository-name ${ecrname} --query "imageIds[?contains(imageTag, '${imageAPIDevName}'].imageTag" --output text)
                 echo "All Images: ${allImages}"
                 exit
                 # Step 2: Filter images for API Dev and extract the tags
