@@ -52,7 +52,7 @@ pipeline {
                 echo "imageAPIDevName: ${imageAPIDevName}"
 
                 # Step 2: List all images and store in apiDevTags
-                apiDevTags=$(aws ecr list-images --repository-name ${ecrname} --query 'imageIds[?contains(imageTag, "${imageAPIDevName}")].imageTag' --output text)
+                apiDevTags=$(aws ecr list-images --repository-name ${ecrname} --query 'imageIds[?contains(imageTag, \"${imageAPIDevName}\")].imageTag' --output text)
                 echo "All Images: ${apiDevTags}"
 
                 # Step 3: Print all images
