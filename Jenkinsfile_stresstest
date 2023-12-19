@@ -50,7 +50,7 @@ pipeline {
 
                 # Step 1: List all images
                 allImages=$(aws ecr list-images --repository-name ${ecrname} --query 'imageIds[*].imageTag' --output text)
-                echo "All Images: ${allImages}"
+                # echo "All Images: ${allImages}"
 
                 # Step 2: Filter images for API Dev
                 apiDevImages=$(echo "${allImages}" | grep ${imageAPIDevName})
