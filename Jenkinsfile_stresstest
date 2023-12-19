@@ -36,19 +36,22 @@ pipeline {
                 set -x
 
                 export AWS_DEFAULT_REGION=us-east-1
-                
+
+                # Replace 'your-ecr-repository-name' with your actual ECR repository name
+                ecrname='production-support-course'
+
                 # Get the latest image tag for API
-                latestAPITag=$(aws ecr describe-images --repository-name production-support-course --query 'images[?contains(imageTags, `${imageAPIDevName}`)].imageTags | [0]' --output text)
+                latestAPITag=$(aws ecr list-images --repository-name ${ecrname} --query 'imageIds[*].imageTag' --output text | grep ${imageAPIDevName} | awk -F'-' '{print $NF}' | sort -n | tail -n 1)
                 imageAPIProd="${imageAPIProdName}${latestAPITag}"
                 echo "Latest API Tag: ${latestAPITag}"
 
                 # Get the latest image tag for DB
-                latestDBTag=$(aws ecr describe-images --repository-name production-support-course --query 'images[?contains(imageTags, `${imageDBDevName}`)].imageTags | [0]' --output text)
+                latestDBTag=$(aws ecr list-images --repository-name ${ecrname} --query 'imageIds[*].imageTag' --output text | grep ${imageDBDevName} | awk -F'-' '{print $NF}' | sort -n | tail -n 1)
                 imageDBProd="${imageDBProdName}${latestDBTag}"
                 echo "Latest DB Tag: ${latestDBTag}"
 
                 # Get the latest image tag for Front End
-                latestFETag=$(aws ecr describe-images --repository-name production-support-course --query 'images[?contains(imageTags, `${imageFEDevName}`)].imageTags | [0]' --output text)
+                latestFETag=$(aws ecr list-images --repository-name ${ecrname} --query 'imageIds[*].imageTag' --output text | grep ${imageFEDevName} | awk -F'-' '{print $NF}' | sort -n | tail -n 1)
                 imageFEProd="${imageFEProdName}${latestFETag}"
                 echo "Latest Front End Tag: ${latestFETag}"
 
