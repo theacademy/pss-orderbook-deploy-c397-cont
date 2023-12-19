@@ -49,15 +49,15 @@ pipeline {
                 echo "Image FE Prod Name: ${imageFEProdName}"
 
                 # Step 1: List all images
-                apiDevTags=$(aws ecr list-images --repository-name ${ecrname} --query 'imageIds[?contains(imageTag, '${imageAPIDevName}'].imageTag' --output text)
+                apiDevTags = sh(script: "aws ecr list-images --repository-name ${ecrname} --query \"imageIds[?contains(imageTag, '${imageAPIDevName}')].imageTag\" --output text", returnStdout: true).trim()
                 echo "All Images: ${apiDevTags}"
                 exit
                 # Step 2: Filter images for API Dev and extract the tags
-                apiDevTags=$(echo "${allImages}" | grep ${imageAPIDevName})
+                apiDevTags = sh(script: "echo \"${apiDevTags}\" | grep ${imageAPIDevName}", returnStdout: true).trim()
                 echo "API Dev Tags: ${apiDevTags}"
 
                 # Step 3: Sort and get the latest tag
-                latestAPITag=$(echo "${apiDevTags}" | sort -n | tail -n 1)
+                latestAPITag = sh(script: "echo \"${apiDevTags}\" | awk -F'-' '{print \$NF}' | sort -n | tail -n 1", returnStdout: true).trim()
                 echo "Latest API Tag: ${latestAPITag}"
 
                 # Final image tag for API Prod
