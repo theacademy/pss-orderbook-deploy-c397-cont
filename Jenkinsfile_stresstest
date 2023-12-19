@@ -1,0 +1,102 @@
+pipeline {
+  agent {
+    kubernetes {
+      yaml """\
+        apiVersion: v1
+        kind: Pod
+        metadata:
+          labels:
+            builder: promotion
+        spec:
+          serviceAccountName: jenkins-agent
+          containers:
+          - name: awscli
+            image: amazon/aws-cli
+            command:
+            - cat
+            tty: true
+      """.stripIndent()
+    }
+  }
+  stages {
+    stage('Promote to Production') {
+      steps {
+        script {
+          for (teamNum in (1..40)) {
+            container(name: 'awscli') {
+              buildNumber = Jenkins.instance.getItem("c500team${teamNum}").lastSuccessfulBuild.number
+              def formattedTeamNum = String.format("%02d", teamNum)
+              env.imageAPIDevName = "c500team${formattedTeamNum}api-dev-"
+              env.imageAPIProdName = "c500team${formattedTeamNum}api-prod-"
+              env.imageDBDevName = "c500team${formattedTeamNum}db-dev-"
+              env.imageDBProdName = "c500team${formattedTeamNum}db-prod-"
+              env.imageFEDevName = "c500team${formattedTeamNum}fe-dev-"
+              env.imageFEProdName = "c500team${formattedTeamNum}fe-prod-"
+
+              sh '''
+                export AWS_DEFAULT_REGION=us-east-1
+                imgNum=''' + buildNumber + '''
+                APIMANIFEST=$(aws ecr batch-get-image --repository-name production-support-course --image-ids imageTag=${imageAPIDevName}${imgNum} --query 'images[].imageManifest' --output text)
+                DBMANIFEST=$(aws ecr batch-get-image --repository-name production-support-course --image-ids imageTag=${imageDBDevName}${imgNum} --query 'images[].imageManifest' --output text)
+                FEMANIFEST=$(aws ecr batch-get-image --repository-name production-support-course --image-ids imageTag=${imageFEDevName}${imgNum} --query 'images[].imageManifest' --output text)
+                
+                # Check API
+                if [ $(aws ecr describe-images --repository-name production-support-course | grep "${imageAPIProdName}${imgNum}" | wc -l) -eq 0 ]
+                then
+                  # We don't have prod so tag Dev to prod
+                  if ! aws ecr put-image --repository-name production-support-course --image-tag ${imageAPIProdName}${imgNum} --image-manifest "$APIMANIFEST"
+                  then
+                    exitvalue=1
+                  fi
+                fi
+                # Check DB
+                if [ $(aws ecr describe-images --repository-name production-support-course | grep "${imageDBProdName}${imgNum}" | wc -l) -eq 0 ]
+                then
+                  # We don't have prod so tag Dev to prod
+                  if ! aws ecr put-image --repository-name production-support-course --image-tag ${imageDBProdName}${imgNum} --image-manifest "$DBMANIFEST"
+                  then
+                    exitvalue="${exitvalue}2"
+                  fi
+                fi
+                
+                # Check Front End
+                if [ $(aws ecr describe-images --repository-name production-support-course | grep "${imageFEProdName}${imgNum}" | wc -l) -eq 0 ]
+                then
+                  # We don't have prod so tag Dev to prod
+                  if ! aws ecr put-image --repository-name production-support-course --image-tag ${imageFEProdName}${imgNum} --image-manifest "$FEMANIFEST"
+                  then
+                    exitvalue=3
+                  fi
+                fi
+
+                case ${exitvalue} in
+                  0) echo "Update OK"
+                     ;;
+                  1) echo "API failed to push to repository"
+                     ;;
+                  2) echo "DB failed to push to repository"
+                     ;;
+                  3) echo "Front End failed to push to repository"
+                     ;;
+                  12) echo "API and DB failed to push to repository"
+                      ;;
+                  13) echo "API and Front End failed to push to repository"
+                      ;;
+                  23) echo "DB and Front End failed to push to repository"
+                      ;;
+                  123) echo "All images failed to push to repository"
+                       ;;
+                esac
+
+                exit ${exitvalue}
+              '''
+            }
+          }
+        }
+      }
+    }
+  }
+  environment {
+    ECR_REPO = '108174090253.dkr.ecr.us-east-1.amazonaws.com/production-support-course'
+  }
+}
