@@ -22,7 +22,7 @@ pipeline {
     stage('Promote to Production') {
       steps {
         script {
-          for (teamNum in (1..40)) {
+          for (int teamNum = 1; teamNum <= 40; teamNum++) {
             container(name: 'awscli') {
               buildNumber = Jenkins.instance.getItem("c500team${teamNum}").lastSuccessfulBuild.number
               def formattedTeamNum = String.format("%02d", teamNum)
