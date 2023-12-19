@@ -25,7 +25,6 @@ pipeline {
           for (int teamNum = 1; teamNum <= 40; teamNum++) {
             container(name: 'awscli') {
               def formattedTeamNum = String.format("%02d", teamNum)
-              buildNumber = Jenkins.instance.getItem("c500team${formattedTeamNum}").lastSuccessfulBuild.number
               env.imageAPIDevName = "c500team${formattedTeamNum}api-dev-"
               env.imageAPIProdName = "c500team${formattedTeamNum}api-prod-"
               env.imageDBDevName = "c500team${formattedTeamNum}db-dev-"
@@ -35,35 +34,65 @@ pipeline {
 
               sh '''
                 export AWS_DEFAULT_REGION=us-east-1
-                imgNum=''' + buildNumber + '''
-                APIMANIFEST=$(aws ecr batch-get-image --repository-name production-support-course --image-ids imageTag=${imageAPIDevName}${imgNum} --query 'images[].imageManifest' --output text)
-                DBMANIFEST=$(aws ecr batch-get-image --repository-name production-support-course --image-ids imageTag=${imageDBDevName}${imgNum} --query 'images[].imageManifest' --output text)
-                FEMANIFEST=$(aws ecr batch-get-image --repository-name production-support-course --image-ids imageTag=${imageFEDevName}${imgNum} --query 'images[].imageManifest' --output text)
                 
+                # Get the latest image tag for API
+                latestAPITag=$(aws ecr describe-images --repository-name production-support-course --query 'images[?contains(imageTags, `${imageAPIDevName}`)].imageTags | [0]' --output text)
+                imageAPIProd="${imageAPIProdName}${latestAPITag}"
+
+                # Get the latest image tag for DB
+                latestDBTag=$(aws ecr describe-images --repository-name production-support-course --query 'images[?contains(imageTags, `${imageDBDevName}`)].imageTags | [0]' --output text)
+                imageDBProd="${imageDBProdName}${latestDBTag}"
+
+                # Get the latest image tag for Front End
+                latestFETag=$(aws ecr describe-images --repository-name production-support-course --query 'images[?contains(imageTags, `${imageFEDevName}`)].imageTags | [0]' --output text)
+                imageFEProd="${imageFEProdName}${latestFETag}"
+
                 # Check API
-                if [ $(aws ecr describe-images --repository-name production-support-course | grep "${imageAPIProdName}${imgNum}" | wc -l) -eq 0 ]
+                if [ -z "${latestAPITag}" ]
+                then
+                  echo "No images found for ${imageAPIProdName}"
+                  exit 1
+                fi
+
+                # Check DB
+                if [ -z "${latestDBTag}" ]
+                then
+                  echo "No images found for ${imageDBProdName}"
+                  exit 2
+                fi
+                
+                # Check Front End
+                if [ -z "${latestFETag}" ]
+                then
+                  echo "No images found for ${imageFEProdName}"
+                  exit 3
+                }
+
+                # Check API
+                if [ $(aws ecr describe-images --repository-name production-support-course | grep "${imageAPIProd}" | wc -l) -eq 0 ]
                 then
                   # We don't have prod so tag Dev to prod
-                  if ! aws ecr put-image --repository-name production-support-course --image-tag ${imageAPIProdName}${imgNum} --image-manifest "$APIMANIFEST"
+                  if ! aws ecr put-image --repository-name production-support-course --image-tag ${imageAPIProd} --image-manifest "$(aws ecr batch-get-image --repository-name production-support-course --image-ids imageTag=${imageAPIDevName}${latestAPITag} --query 'images[].imageManifest' --output text)"
                   then
                     exitvalue=1
                   fi
                 fi
+
                 # Check DB
-                if [ $(aws ecr describe-images --repository-name production-support-course | grep "${imageDBProdName}${imgNum}" | wc -l) -eq 0 ]
+                if [ $(aws ecr describe-images --repository-name production-support-course | grep "${imageDBProd}" | wc -l) -eq 0 ]
                 then
                   # We don't have prod so tag Dev to prod
-                  if ! aws ecr put-image --repository-name production-support-course --image-tag ${imageDBProdName}${imgNum} --image-manifest "$DBMANIFEST"
+                  if ! aws ecr put-image --repository-name production-support-course --image-tag ${imageDBProd} --image-manifest "$(aws ecr batch-get-image --repository-name production-support-course --image-ids imageTag=${imageDBDevName}${latestDBTag} --query 'images[].imageManifest' --output text)"
                   then
                     exitvalue="${exitvalue}2"
                   fi
                 fi
                 
                 # Check Front End
-                if [ $(aws ecr describe-images --repository-name production-support-course | grep "${imageFEProdName}${imgNum}" | wc -l) -eq 0 ]
+                if [ $(aws ecr describe-images --repository-name production-support-course | grep "${imageFEProd}" | wc -l) -eq 0 ]
                 then
                   # We don't have prod so tag Dev to prod
-                  if ! aws ecr put-image --repository-name production-support-course --image-tag ${imageFEProdName}${imgNum} --image-manifest "$FEMANIFEST"
+                  if ! aws ecr put-image --repository-name production-support-course --image-tag ${imageFEProd} --image-manifest "$(aws ecr batch-get-image --repository-name production-support-course --image-ids imageTag=${imageFEDevName}${latestFETag} --query 'images[].imageManifest' --output text)"
                   then
                     exitvalue=3
                   fi
