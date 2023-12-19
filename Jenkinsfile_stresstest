@@ -24,8 +24,8 @@ pipeline {
         script {
           for (int teamNum = 1; teamNum <= 40; teamNum++) {
             container(name: 'awscli') {
-              buildNumber = Jenkins.instance.getItem("c500team${teamNum}").lastSuccessfulBuild.number
               def formattedTeamNum = String.format("%02d", teamNum)
+              buildNumber = Jenkins.instance.getItem("c500team${formattedTeamNum}").lastSuccessfulBuild.number
               env.imageAPIDevName = "c500team${formattedTeamNum}api-dev-"
               env.imageAPIProdName = "c500team${formattedTeamNum}api-prod-"
               env.imageDBDevName = "c500team${formattedTeamNum}db-dev-"
