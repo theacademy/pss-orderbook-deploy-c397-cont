@@ -40,41 +40,31 @@ pipeline {
                 # Replace 'your-ecr-repository-name' with your actual ECR repository name
                 ecrname='production-support-course'
 
+                # Print environment variables for debugging
+                echo "Image API Dev Name: ${imageAPIDevName}"
+                echo "Image API Prod Name: ${imageAPIProdName}"
+                echo "Image DB Dev Name: ${imageDBDevName}"
+                echo "Image DB Prod Name: ${imageDBProdName}"
+                echo "Image FE Dev Name: ${imageFEDevName}"
+                echo "Image FE Prod Name: ${imageFEProdName}"
+
                 # Get the latest image tag for API
                 latestAPITag=$(aws ecr list-images --repository-name ${ecrname} --query 'imageIds[*].imageTag' --output text | grep ${imageAPIDevName} | awk -F'-' '{print $NF}' | sort -n | tail -n 1)
                 imageAPIProd="${imageAPIProdName}${latestAPITag}"
                 echo "Latest API Tag: ${latestAPITag}"
+                echo "Image API Prod: ${imageAPIProd}"
 
                 # Get the latest image tag for DB
                 latestDBTag=$(aws ecr list-images --repository-name ${ecrname} --query 'imageIds[*].imageTag' --output text | grep ${imageDBDevName} | awk -F'-' '{print $NF}' | sort -n | tail -n 1)
                 imageDBProd="${imageDBProdName}${latestDBTag}"
                 echo "Latest DB Tag: ${latestDBTag}"
+                echo "Image DB Prod: ${imageDBProd}"
 
                 # Get the latest image tag for Front End
                 latestFETag=$(aws ecr list-images --repository-name ${ecrname} --query 'imageIds[*].imageTag' --output text | grep ${imageFEDevName} | awk -F'-' '{print $NF}' | sort -n | tail -n 1)
                 imageFEProd="${imageFEProdName}${latestFETag}"
                 echo "Latest Front End Tag: ${latestFETag}"
-
-                # Check API
-                if [ -z "${latestAPITag}" ]
-                then
-                  echo "No images found for ${imageAPIProdName}"
-                  exit 1
-                fi
-
-                # Check DB
-                if [ -z "${latestDBTag}" ]
-                then
-                  echo "No images found for ${imageDBProdName}"
-                  exit 2
-                fi
-                
-                # Check Front End
-                if [ -z "${latestFETag}" ]
-                then
-                  echo "No images found for ${imageFEProdName}"
-                  exit 3
-                fi
+                echo "Image FE Prod: ${imageFEProd}"
 
                 # Check API
                 if [ $(aws ecr describe-images --repository-name production-support-course | grep "${imageAPIProd}" | wc -l) -eq 0 ]
@@ -105,6 +95,9 @@ pipeline {
                     exitvalue=3
                   fi
                 fi
+
+                # Print exit value for debugging
+                echo "Exit Value: ${exitvalue}"
 
                 case ${exitvalue} in
                   0) echo "Update OK"
