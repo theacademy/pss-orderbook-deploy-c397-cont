@@ -33,19 +33,24 @@ pipeline {
               env.imageFEProdName = "c500team${formattedTeamNum}fe-prod-"
 
               sh '''
+                set -x
+                
                 export AWS_DEFAULT_REGION=us-east-1
                 
                 # Get the latest image tag for API
                 latestAPITag=$(aws ecr describe-images --repository-name production-support-course --query 'images[?contains(imageTags, `${imageAPIDevName}`)].imageTags | [0]' --output text)
                 imageAPIProd="${imageAPIProdName}${latestAPITag}"
+                echo "Latest API Tag: ${latestAPITag}"
 
                 # Get the latest image tag for DB
                 latestDBTag=$(aws ecr describe-images --repository-name production-support-course --query 'images[?contains(imageTags, `${imageDBDevName}`)].imageTags | [0]' --output text)
                 imageDBProd="${imageDBProdName}${latestDBTag}"
+                echo "Latest DB Tag: ${latestDBTag}"
 
                 # Get the latest image tag for Front End
                 latestFETag=$(aws ecr describe-images --repository-name production-support-course --query 'images[?contains(imageTags, `${imageFEDevName}`)].imageTags | [0]' --output text)
                 imageFEProd="${imageFEProdName}${latestFETag}"
+                echo "Latest Front End Tag: ${latestFETag}"
 
                 # Check API
                 if [ -z "${latestAPITag}" ]
@@ -66,7 +71,7 @@ pipeline {
                 then
                   echo "No images found for ${imageFEProdName}"
                   exit 3
-                }
+                fi
 
                 # Check API
                 if [ $(aws ecr describe-images --repository-name production-support-course | grep "${imageAPIProd}" | wc -l) -eq 0 ]
