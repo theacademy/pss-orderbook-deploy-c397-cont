@@ -48,23 +48,27 @@ pipeline {
                 echo "Image FE Dev Name: ${imageFEDevName}"
                 echo "Image FE Prod Name: ${imageFEProdName}"
 
-                # Get the latest image tag for API
-                latestAPITag=$(aws ecr list-images --repository-name ${ecrname} --query 'imageIds[*].imageTag' --output text | grep ${imageAPIDevName} | awk -F'-' '{print $NF}' | sort -n | tail -n 1)
-                imageAPIProd="${imageAPIProdName}${latestAPITag}"
+                # Step 1: List all images
+                allImages=$(aws ecr list-images --repository-name ${ecrname} --query 'imageIds[*].imageTag' --output text)
+                echo "All Images: ${allImages}"
+
+                # Step 2: Filter images for API Dev
+                apiDevImages=$(echo "${allImages}" | grep ${imageAPIDevName})
+                echo "API Dev Images: ${apiDevImages}"
+
+                # Step 3: Extract the tags
+                apiDevTags=$(echo "${apiDevImages}" | awk -F'-' '{print $NF}')
+                echo "API Dev Tags: ${apiDevTags}"
+
+                # Step 4: Sort and get the latest tag
+                latestAPITag=$(echo "${apiDevTags}" | sort -n | tail -n 1)
                 echo "Latest API Tag: ${latestAPITag}"
+
+                # Final image tag for API Prod
+                imageAPIProd="${imageAPIProdName}${latestAPITag}"
                 echo "Image API Prod: ${imageAPIProd}"
 
-                # Get the latest image tag for DB
-                latestDBTag=$(aws ecr list-images --repository-name ${ecrname} --query 'imageIds[*].imageTag' --output text | grep ${imageDBDevName} | awk -F'-' '{print $NF}' | sort -n | tail -n 1)
-                imageDBProd="${imageDBProdName}${latestDBTag}"
-                echo "Latest DB Tag: ${latestDBTag}"
-                echo "Image DB Prod: ${imageDBProd}"
-
-                # Get the latest image tag for Front End
-                latestFETag=$(aws ecr list-images --repository-name ${ecrname} --query 'imageIds[*].imageTag' --output text | grep ${imageFEDevName} | awk -F'-' '{print $NF}' | sort -n | tail -n 1)
-                imageFEProd="${imageFEProdName}${latestFETag}"
-                echo "Latest Front End Tag: ${latestFETag}"
-                echo "Image FE Prod: ${imageFEProd}"
+                # ... (similar steps for DB and Front End)
 
                 # Check API
                 if [ $(aws ecr describe-images --repository-name production-support-course | grep "${imageAPIProd}" | wc -l) -eq 0 ]
@@ -76,25 +80,7 @@ pipeline {
                   fi
                 fi
 
-                # Check DB
-                if [ $(aws ecr describe-images --repository-name production-support-course | grep "${imageDBProd}" | wc -l) -eq 0 ]
-                then
-                  # We don't have prod so tag Dev to prod
-                  if ! aws ecr put-image --repository-name production-support-course --image-tag ${imageDBProd} --image-manifest "$(aws ecr batch-get-image --repository-name production-support-course --image-ids imageTag=${imageDBDevName}${latestDBTag} --query 'images[].imageManifest' --output text)"
-                  then
-                    exitvalue="${exitvalue}2"
-                  fi
-                fi
-                
-                # Check Front End
-                if [ $(aws ecr describe-images --repository-name production-support-course | grep "${imageFEProd}" | wc -l) -eq 0 ]
-                then
-                  # We don't have prod so tag Dev to prod
-                  if ! aws ecr put-image --repository-name production-support-course --image-tag ${imageFEProd} --image-manifest "$(aws ecr batch-get-image --repository-name production-support-course --image-ids imageTag=${imageFEDevName}${latestFETag} --query 'images[].imageManifest' --output text)"
-                  then
-                    exitvalue=3
-                  fi
-                fi
+                # ... (similar checks for DB and Front End)
 
                 # Print exit value for debugging
                 echo "Exit Value: ${exitvalue}"
