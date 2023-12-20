@@ -48,33 +48,33 @@ pipeline {
                 echo "Image FE Dev Name: ${imageFEDevName}"
                 echo "Image FE Prod Name: ${imageFEProdName}"
 
-                # Step 1: Check the value of imageAPIDevName
-                echo "imageAPIDevName: ${imageAPIDevName}"
-
-                # Step 2: List all images and store in apiDevTags
+                # API Images
                 apiDevTags=$(aws ecr list-images --repository-name production-support-course --query "imageIds[].imageTag" --output text | sed "s/\\t/\\n/g" | grep ${imageAPIDevName})
-                echo "All Images: ${apiDevTags}"
-
-                # Step 3: Print all images
-                echo "All Images: ${apiDevTags}"
-
-                # Step 4: Exit
-                exit
-
-                exit
-                # Step 2: Filter images for API Dev and extract the tags
-                apiDevTags=$(echo "${allImages}" | grep ${imageAPIDevName})
-                echo "API Dev Tags: ${apiDevTags}"
-
-                # Step 3: Sort and get the latest tag
+                echo "All API ImagesImages: ${apiDevTags}"
                 latestAPITag=$(echo "${apiDevTags}" | sort -n | tail -n 1)
                 echo "Latest API Tag: ${latestAPITag}"
-
-                # Final image tag for API Prod
                 imageAPIProd="${imageAPIProdName}${latestAPITag}"
                 echo "Image API Prod: ${imageAPIProd}"
 
-                # ... (similar steps for DB and Front End)
+                # DB Images
+                dbDevTags=$(aws ecr list-images --repository-name production-support-course --query "imageIds[].imageTag" --output text | sed "s/\\t/\\n/g" | grep ${imageDBDevName})    
+                echo "All DB ImagesImages: ${dbDevTags}"
+                latestDBTag=$(echo "${dbDevTags}" | sort -n | tail -n 1)
+                echo "Latest API Tag: ${latestDBTag}"
+                imageDBProd="${imageDBProdName}${latestDBTag}"
+                echo "Image DB Prod: ${imageDBProd}"
+
+                # FE Images
+                feDevTags=$(aws ecr list-images --repository-name production-support-course --query "imageIds[].imageTag" --output text | sed "s/\\t/\\n/g" | grep ${imageFEDevName})
+                echo "All FE ImagesImages: ${feDevTags}"
+                # Step 3: Sort and get the latest tag
+                latestFETag=$(echo "${feDevTags}" | sort -n | tail -n 1)
+                echo "Latest FE Tag: ${latestFETag}"
+                # Final image tag for API Prod
+                imageFEProd="${imageFEProdName}${latestFETag}"
+                echo "Image FE Prod: ${imageFEProd}"
+
+
 
                 # Check API
                 if [ $(aws ecr describe-images --repository-name production-support-course | grep "${imageAPIProd}" | wc -l) -eq 0 ]
