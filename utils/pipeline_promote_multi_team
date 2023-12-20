@@ -34,37 +34,34 @@ pipeline {
               DB_build_num=$( echo "$DB_image" | sed -e 's/"imageTag": "$COURSE$TEAMdb-dev-\\(.*\\)"/\\1/' | tr -d ' ')
             FE_image=$(aws ecr list-images --repository-name production-support-course | grep "$COURSE$TEAMfe-dev-" | sort -V | tail -1 )
               FE_build_num=$( echo "$FE_image" | sed -e 's/"imageTag": "$COURSE$TEAMfe-dev-\\(.*\\)"/\\1/' | tr -d ' ')
-            Currency_image=$(aws ecr list-images --repository-name production-support-course | grep "$COURSE$TEAMcurrency-api-dev-" | sort -V | tail -1 )
-              Currency_build_num=$( echo "$Currency_image" | sed -e 's/"imageTag": "$COURSE$TEAMcurrency-api-dev-\\(.*\\)"/\\1/' | tr -d ' ')
-            APIMANIFEST=$(aws ecr batch-get-image --repository-name production-support-course --image-ids imageTag=${imageAPIDevName}${API_build_num} --query 'images[].imageManifest' --output text)
-            DBMANIFEST=$(aws ecr batch-get-image --repository-name production-support-course --image-ids imageTag=${imageDBDevName}${DB_build_num} --query 'images[].imageManifest' --output text)
-            FEMANIFEST=$(aws ecr batch-get-image --repository-name production-support-course --image-ids imageTag=${imageFEDevName}${FE_build_num} --query 'images[].imageManifest' --output text)
-            CURRENCYMANIFEST=$(aws ecr batch-get-image --repository-name production-support-course --image-ids imageTag=${imageCurrencyDevName}${Currency_build_num} --query 'images[].imageManifest' --output text)
+            APIMANIFEST=$(aws ecr batch-get-image --repository-name production-support-course --image-ids imageTag=$COURSE$TEAMapi-dev-${API_build_num} --query 'images[].imageManifest' --output text)
+            DBMANIFEST=$(aws ecr batch-get-image --repository-name production-support-course --image-ids imageTag=$COURSE$TEAMdb-dev-${DB_build_num} --query 'images[].imageManifest' --output text)
+            FEMANIFEST=$(aws ecr batch-get-image --repository-name production-support-course --image-ids imageTag=$COURSE$TEAMfe-dev-${FE_build_num} --query 'images[].imageManifest' --output text)
 
             # Check API
-            if [ $(aws ecr describe-images --repository-name production-support-course | grep "${imageAPIPrdName}${API_build_num}" | wc -l) -eq 0 ]
+            if [ $(aws ecr describe-images --repository-name production-support-course | grep "$COURSE$TEAMapi-prod-${API_build_num}" | wc -l) -eq 0 ]
             then
               # We don't have prod so tag Dev to prod
-              if ! aws ecr put-image --repository-name production-support-course --image-tag ${imageAPIPrdName}${API_build_num} --image-manifest "$APIMANIFEST"
+              if ! aws ecr put-image --repository-name production-support-course --image-tag "$COURSE$TEAMapi-prod-${API_build_num} --image-manifest "$APIMANIFEST"
               then
                 exitvalue=1
               fi
             fi
             # Check DB
-            if [ $(aws ecr describe-images --repository-name production-support-course | grep "${imageDBPrdName}${DB_build_num}" | wc -l) -eq 0 ]
+            if [ $(aws ecr describe-images --repository-name production-support-course | grep "$COURSE$TEAMdb-prod-${DB_build_num}" | wc -l) -eq 0 ]
             then
               # We don't have uat so tag Dev to prod
-              if ! aws ecr put-image --repository-name production-support-course --image-tag ${imageDBPrdName}${DB_build_num} --image-manifest "$DBMANIFEST"
+              if ! aws ecr put-image --repository-name production-support-course --image-tag "$COURSE$TEAMdb-prod-${DB_build_num} --image-manifest "$DBMANIFEST"
               then
                 exitvalue="${exitvalue}2"
               fi
             fi
             
             # Check Front End
-            if [ $(aws ecr describe-images --repository-name production-support-course | grep "${imageFEPrdName}${FE_build_num}" | wc -l) -eq 0 ]
+            if [ $(aws ecr describe-images --repository-name production-support-course | grep "$COURSE$TEAMfe-prod-${FE_build_num}" | wc -l) -eq 0 ]
             then
               # We don't have uat so tag Dev to prod
-              if ! aws ecr put-image --repository-name production-support-course --image-tag ${imageFEPrdName}${FE_build_num} --image-manifest "$FEMANIFEST"
+              if ! aws ecr put-image --repository-name production-support-course --image-tag "$COURSE$TEAMfe-prod-${FE_build_num} --image-manifest "$FEMANIFEST"
               then
                 exitvalue=3
               fi
@@ -88,7 +85,6 @@ pipeline {
             123) echo "All images failed to push to repository"
                ;;
           esac
-
           exit ${exitvalue}
           done'''
         }
@@ -99,11 +95,5 @@ pipeline {
     ECR_REPO = '108174090253.dkr.ecr.us-east-1.amazonaws.com/production-support-course'
     COURSE='c999'
     NUMBER_OF_TEAM='2'
-    imageAPIDevName='api-dev-'
-    imageAPIPrdName='api-prd-'
-    imageDBDevName='db-dev-'
-    imageDBPrdName='db-prd-'
-    imageFEDevName='fe-dev-'
-    imageFEPrdName='fe-prd-'
   }
 }
