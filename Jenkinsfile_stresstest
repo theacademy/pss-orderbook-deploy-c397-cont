@@ -49,7 +49,7 @@ pipeline {
                 echo "Image FE Prod Name: ${imageFEProdName}"
 
                 # API Images
-                apiDevTags=$(aws ecr list-images --repository-name production-support-course --query "imageIds[].imageTag" --output text | sed "s/\\t/\\n/g" | grep ${imageAPIDevName})
+                apiDevTags=$(aws ecr list-images --repository-name production-support-course  --filter "tagStatus=TAGGED" --query "imageIds[?contains(imageTag, '${imageAPIDevName}')].imageTag" --output text)
                 echo "All API ImagesImages: ${apiDevTags}"
                 latestAPITag=$(echo "${apiDevTags}" | sort -n | tail -n 1 | grep -oE '[0-9]+$' | awk '{print $1}')
                 echo "Latest API Tag: ${latestAPITag}"
@@ -57,7 +57,7 @@ pipeline {
                 echo "Image API Prod: ${imageAPIProd}"
 
                 # DB Images
-                dbDevTags=$(aws ecr list-images --repository-name production-support-course --query "imageIds[].imageTag" --output text | sed "s/\\t/\\n/g" | grep ${imageDBDevName})    
+                dbDevTags=$(aws ecr list-images --repository-name production-support-course  --filter "tagStatus=TAGGED" --query "imageIds[?contains(imageTag, '${imageDBDevName}')].imageTag" --output text)
                 echo "All DB ImagesImages: ${dbDevTags}"
                 latestDBTag=$(echo "${dbDevTags}" | sort -n | tail -n 1 | grep -oE '[0-9]+$' | awk '{print $1}')
                 echo "Latest API Tag: ${latestDBTag}"
@@ -65,7 +65,7 @@ pipeline {
                 echo "Image DB Prod: ${imageDBProd}"
 
                 # FE Images
-                feDevTags=$(aws ecr list-images --repository-name production-support-course --query "imageIds[].imageTag" --output text | sed "s/\\t/\\n/g" | grep ${imageFEDevName})
+                feDevTags=$(aws ecr list-images --repository-name production-support-course  --filter "tagStatus=TAGGED" --query "imageIds[?contains(imageTag, '${imageFEDevName}')].imageTag" --output text)
                 echo "All FE ImagesImages: ${feDevTags}"
                 # Step 3: Sort and get the latest tag
                 latestFETag=$(echo "${feDevTags}" | sort -n | tail -n 1 | grep -oE '[0-9]+$' | awk '{print $1}')
