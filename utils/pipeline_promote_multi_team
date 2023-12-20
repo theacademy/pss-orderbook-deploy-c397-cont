@@ -19,7 +19,7 @@ pipeline {
     }
   }
   stages {
-    stage('Promote to UAT env') {
+    stage('Promote to PROD env') {
       steps {
           container(name: 'awscli') {
             sh '''
@@ -29,8 +29,10 @@ pipeline {
             do
             TEAM="team$(printf "%02d" ${i})
             API_image=$(aws ecr list-images --repository-name production-support-course | grep "${COURSE}${TEAM}api-dev-" | sort -V | tail -1 )
+            echo $API_image
               API_build_num=$( echo "$API_image" | sed -e 's/"imageTag": "${COURSE}${TEAM}api-dev-\\(.*\\)"/\\1/' | tr -d ' ')
             DB_image=$(aws ecr list-images --repository-name production-support-course | grep "${COURSE}${TEAM}db-dev-" | sort -V | tail -1 )
+            echo $API_build_num
               DB_build_num=$( echo "$DB_image" | sed -e 's/"imageTag": "${COURSE}${TEAM}db-dev-\\(.*\\)"/\\1/' | tr -d ' ')
             FE_image=$(aws ecr list-images --repository-name production-support-course | grep "${COURSE}${TEAM}fe-dev-" | sort -V | tail -1 )
               FE_build_num=$( echo "$FE_image" | sed -e 's/"imageTag": "${COURSE}${TEAM}fe-dev-\\(.*\\)"/\\1/' | tr -d ' ')
