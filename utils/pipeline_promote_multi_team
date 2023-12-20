@@ -27,7 +27,7 @@ pipeline {
             export AWS_DEFAULT_REGION=us-east-1
             for i in $(seq $NUMBER_OF_TEAM)
             do
-            TEAM="team$(printf "%02d" ${i})"
+            TEAM="team$(printf "%02d" ${i})
             API_image=$(aws ecr list-images --repository-name production-support-course | grep "${COURSE}${TEAM}api-dev-" | sort -V | tail -1 )
             echo $API_image
               API_build_num=$( echo "$API_image" | sed -e 's/"imageTag": "${COURSE}${TEAM}api-dev-\\(.*\\)"/\\1/' | tr -d ' ')
@@ -44,7 +44,7 @@ pipeline {
             if [ $(aws ecr describe-images --repository-name production-support-course | grep "${COURSE}${TEAM}api-prod-${API_build_num}" | wc -l) -eq 0 ]
             then
               # We don't have prod so tag Dev to prod
-              if ! aws ecr put-image --repository-name production-support-course --image-tag "${COURSE}${TEAM}api-prod-${API_build_num} --image-manifest "$APIMANIFEST"
+              if ! aws ecr put-image --repository-name production-support-course --image-tag "${COURSE}${TEAM}api-prod-${API_build_num}" --image-manifest "$APIMANIFEST"
               then
                 exitvalue=1
               fi
@@ -53,7 +53,7 @@ pipeline {
             if [ $(aws ecr describe-images --repository-name production-support-course | grep "${COURSE}${TEAM}db-prod-${DB_build_num}" | wc -l) -eq 0 ]
             then
               # We don't have uat so tag Dev to prod
-              if ! aws ecr put-image --repository-name production-support-course --image-tag "${COURSE}${TEAM}db-prod-${DB_build_num} --image-manifest "$DBMANIFEST"
+              if ! aws ecr put-image --repository-name production-support-course --image-tag "${COURSE}${TEAM}db-prod-${DB_build_num}" --image-manifest "$DBMANIFEST"
               then
                 exitvalue="${exitvalue}2"
               fi
@@ -63,7 +63,7 @@ pipeline {
             if [ $(aws ecr describe-images --repository-name production-support-course | grep "${COURSE}${TEAM}fe-prod-${FE_build_num}" | wc -l) -eq 0 ]
             then
               # We don't have uat so tag Dev to prod
-              if ! aws ecr put-image --repository-name production-support-course --image-tag "${COURSE}${TEAM}fe-prod-${FE_build_num} --image-manifest "$FEMANIFEST"
+              if ! aws ecr put-image --repository-name production-support-course --image-tag "${COURSE}${TEAM}fe-prod-${FE_build_num}" --image-manifest "$FEMANIFEST"
               then
                 exitvalue=3
               fi
