@@ -68,26 +68,6 @@ pipeline {
                 exitvalue=3
               fi
             fi
-
-          case ${exitvalue} in
-            0) echo "Update OK"
-               ;;
-            1) echo "API failed to push to repository"
-               ;;
-            2) echo "DB failed to push to repository"
-               ;;
-            3) echo "AC failed to push to repository"
-               ;;
-            12) echo "API and DB failed to push to repository"
-               ;;
-            13) echo "API and AC failed to push to repository"
-               ;;
-            23) echo "DB and AC failed to push to repository"
-               ;;
-            123) echo "All images failed to push to repository"
-               ;;
-          esac
-          exit ${exitvalue}
           done'''
         }
       }
