@@ -51,7 +51,7 @@ pipeline {
                 # API Images
                 apiDevTags=$(aws ecr list-images --repository-name production-support-course --query "imageIds[].imageTag" --output text | sed "s/\\t/\\n/g" | grep ${imageAPIDevName})
                 echo "All API ImagesImages: ${apiDevTags}"
-                latestAPITag=$(echo "${apiDevTags}" | sort -n | tail -n 1)
+                latestAPITag=$(echo "${apiDevTags}" | sort -n | tail -n 1 | grep -oE '[0-9]+$' | awk '{print $1}')
                 echo "Latest API Tag: ${latestAPITag}"
                 imageAPIProd="${imageAPIProdName}${latestAPITag}"
                 echo "Image API Prod: ${imageAPIProd}"
@@ -59,7 +59,7 @@ pipeline {
                 # DB Images
                 dbDevTags=$(aws ecr list-images --repository-name production-support-course --query "imageIds[].imageTag" --output text | sed "s/\\t/\\n/g" | grep ${imageDBDevName})    
                 echo "All DB ImagesImages: ${dbDevTags}"
-                latestDBTag=$(echo "${dbDevTags}" | sort -n | tail -n 1)
+                latestDBTag=$(echo "${dbDevTags}" | sort -n | tail -n 1 | grep -oE '[0-9]+$' | awk '{print $1}')
                 echo "Latest API Tag: ${latestDBTag}"
                 imageDBProd="${imageDBProdName}${latestDBTag}"
                 echo "Image DB Prod: ${imageDBProd}"
@@ -68,7 +68,7 @@ pipeline {
                 feDevTags=$(aws ecr list-images --repository-name production-support-course --query "imageIds[].imageTag" --output text | sed "s/\\t/\\n/g" | grep ${imageFEDevName})
                 echo "All FE ImagesImages: ${feDevTags}"
                 # Step 3: Sort and get the latest tag
-                latestFETag=$(echo "${feDevTags}" | sort -n | tail -n 1)
+                latestFETag=$(echo "${feDevTags}" | sort -n | tail -n 1 | grep -oE '[0-9]+$' | awk '{print $1}')
                 echo "Latest FE Tag: ${latestFETag}"
                 # Final image tag for API Prod
                 imageFEProd="${imageFEProdName}${latestFETag}"
