@@ -75,7 +75,7 @@ pipeline {
   }
   environment {
     ECR_REPO = '108174090253.dkr.ecr.us-east-1.amazonaws.com/production-support-course'
-    COURSE='c999'
-    NUMBER_OF_TEAM='2'
+    COURSE='c500'
+    NUMBER_OF_TEAM='60'
   }
 }
