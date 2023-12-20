@@ -22,10 +22,6 @@ pipeline {
     stage('Promote to UAT env') {
       steps {
           container(name: 'awscli') {
-            script {
-              buildNumber = Jenkins.instance.getItem(projectName).lastSuccessfulBuild.number
-            }
-
             sh '''
             #!/bin/bash
             export AWS_DEFAULT_REGION=us-east-1
