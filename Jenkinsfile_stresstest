@@ -86,6 +86,26 @@ pipeline {
                   fi
                 fi
 
+                # Check API
+                if [ $(aws ecr describe-images --repository-name production-support-course | grep "${imageDBProd}" | wc -l) -eq 0 ]
+                then
+                  # We don't have prod so tag Dev to prod
+                  if ! aws ecr put-image --repository-name production-support-course --image-tag ${imageDBProd} --image-manifest "$(aws ecr batch-get-image --repository-name production-support-course --image-ids imageTag=${imageDBDevName}${latestDBTag} --query 'images[].imageManifest' --output text)"
+                  then
+                    exitvalue=1
+                  fi
+                fi
+
+                # Check API
+                if [ $(aws ecr describe-images --repository-name production-support-course | grep "${imageFEProd}" | wc -l) -eq 0 ]
+                then
+                  # We don't have prod so tag Dev to prod
+                  if ! aws ecr put-image --repository-name production-support-course --image-tag ${imageFEProd} --image-manifest "$(aws ecr batch-get-image --repository-name production-support-course --image-ids imageTag=${imageFEDevName}${latestFETag} --query 'images[].imageManifest' --output text)"
+                  then
+                    exitvalue=1
+                  fi
+                fi
+
                 # ... (similar checks for DB and Front End)
 
                 # Print exit value for debugging
