@@ -94,8 +94,7 @@ pipeline {
           esac
 
           exit ${exitvalue}
-          done
-'''
+          done'''
         }
       }
     }
