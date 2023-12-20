@@ -30,6 +30,15 @@ pipeline {
             TEAM="team$(printf "%02d" ${i})"
             API_image=$(aws ecr list-images --repository-name production-support-course | grep "${COURSE}${TEAM}api-dev-" | sort -V | tail -1 | awk -F':' '{print$2}' | tr -d '"')
             echo $API_image
+            API_build_num=$(echo $API_image | awk -F'-' '{print$3})
+            DB_image=$(aws ecr list-images --repository-name production-support-course | grep "${COURSE}${TEAM}db-dev-" | sort -V | tail -1 | awk -F':' '{print$2}' | tr -d '"')
+            echo $API_build_num
+            DB_build_num=$(echo $DB_image | awk -F'-' '{print$3})
+            FE_image=$(aws ecr list-images --repository-name production-support-course | grep "${COURSE}${TEAM}fe-dev-" | sort -V | tail -1 | awk -F':' '{print$2}' | tr -d '"')
+            FE_build_num=$(echo $FE_image | awk -F'-' '{print$3})
+            APIMANIFEST=$(aws ecr batch-get-image --repository-name production-support-course --image-ids imageTag=${COURSE}${TEAM}api-dev-${API_build_num} --query 'images[].imageManifest' --output text)
+            DBMANIFEST=$(aws ecr batch-get-image --repository-name production-support-course --image-ids imageTag=${COURSE}${TEAM}db-dev-${DB_build_num} --query 'images[].imageManifest' --output text)
+            FEMANIFEST=$(aws ecr batch-get-image --repository-name production-support-course --image-ids imageTag=${COURSE}${TEAM}fe-dev-${FE_build_num} --query 'images[].imageManifest' --output text)
             done'''
         }
       }
