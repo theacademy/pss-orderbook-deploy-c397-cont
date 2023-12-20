@@ -22,7 +22,7 @@ pipeline {
     stage('Promote to Production') {
       steps {
         script {
-          for (int teamNum = 1; teamNum <= 40; teamNum++) {
+          for (int teamNum = 26; teamNum <= 40; teamNum++) {
             container(name: 'awscli') {
               def formattedTeamNum = String.format("%02d", teamNum)
               env.imageAPIDevName = "c500team${formattedTeamNum}api-dev-"
