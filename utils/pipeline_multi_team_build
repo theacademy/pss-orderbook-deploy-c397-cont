@@ -13,7 +13,7 @@ pipeline {
         sh '''echo \'{ "credsStore": "ecr-login" }\' > /kaniko/.docker/config.json
         for i in $(seq $NUMBER_OF_TEAM)
         do
-        /kaniko/executor -f `pwd`/Dockerfiles/Dockerfile_nginx -c `pwd` --insecure --skip-tls-verify --cache=false --destination=${ECR_REPO}:${JOB_NAME_FORCED}$(printf "%02d"${i})fe-dev-${BUILD_NUMBER}
+        /kaniko/executor -f `pwd`/Dockerfiles/Dockerfile_nginx -c `pwd` --insecure --skip-tls-verify --cache=false --destination=${ECR_REPO}:${JOB_NAME_FORCED}$(printf "%02d" ${i})fe-dev-${BUILD_NUMBER}
         done'''
         }
       }
@@ -31,7 +31,7 @@ pipeline {
         sh '''echo \'{ "credsStore": "ecr-login" }\' > /kaniko/.docker/config.json
         for i in $(seq $NUMBER_OF_TEAM)
         do
-        /kaniko/executor -f `pwd`/Dockerfiles/Dockerfile_mysql -c `pwd` --insecure --skip-tls-verify --cache=false --destination=${ECR_REPO}:$${JOB_NAME_FORCED}$(printf "%02d"${i})db-dev-${BUILD_NUMBER}
+        /kaniko/executor -f `pwd`/Dockerfiles/Dockerfile_mysql -c `pwd` --insecure --skip-tls-verify --cache=false --destination=${ECR_REPO}:$${JOB_NAME_FORCED}$(printf "%02d" ${i})db-dev-${BUILD_NUMBER}
         done'''
         }
       }
