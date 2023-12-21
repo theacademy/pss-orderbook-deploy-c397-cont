@@ -7,14 +7,12 @@ def buildAndPublishStage(String service, String dockerfile, int teamNumber) {
                 }
             }
             steps {
-                container(name: "kaniko") {
-                    script {
-                        def iValue = teamNumber.toString()
-                        def imageName = "${ECR_REPO}:${JOB_NAME_FORCED}${service.toLowerCase()}-dev-${BUILD_NUMBER}\$(printf \"%02d\" \${iValue})"
-                        sh """echo '{ "credsStore": "ecr-login" }' > /kaniko/.docker/config.json
-                            /kaniko/executor -f \$(pwd)/Dockerfiles/${dockerfile} -c \$(pwd) --insecure --skip-tls-verify --cache=false --destination=${imageName}
-                        """
-                    }
+                script {
+                    def iValue = teamNumber.toString()
+                    def imageName = "${ECR_REPO}:${JOB_NAME_FORCED}${service.toLowerCase()}-dev-${BUILD_NUMBER}\$(printf \"%02d\" \${iValue})"
+                    sh """echo '{ "credsStore": "ecr-login" }' > /kaniko/.docker/config.json
+                        /kaniko/executor -f \$(pwd)/Dockerfiles/${dockerfile} -c \$(pwd) --insecure --skip-tls-verify --cache=false --destination=${imageName}
+                    """
                 }
             }
         }
