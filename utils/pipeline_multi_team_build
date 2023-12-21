@@ -8,7 +8,7 @@ pipeline {
         ECR_REPO = '108174090253.dkr.ecr.us-east-1.amazonaws.com/production-support-course'
     }
     stages {
-        stage("Build Trading Front End - ${COHORT}team${TEAM_NUMBER}") {
+        stage("Build Trading Front End ") {
             agent {
                 node {
                     label 'kaniko'
@@ -22,7 +22,7 @@ pipeline {
             }
         }
 
-        stage("Build and Publish DB - ${COHORT}team${TEAM_NUMBER}") {
+        stage("Build and Publish DB ") {
             agent {
                 node {
                     label 'kaniko'
@@ -36,7 +36,7 @@ pipeline {
             }
         }
 
-        stage("Build and Publish API - ${COHORT}team${TEAM_NUMBER}") {
+        stage("Build and Publish API - ") {
             agent {
                 node {
                     label 'kaniko'
