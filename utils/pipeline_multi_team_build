@@ -1,19 +1,17 @@
 def buildAndPublishStage(String service, String dockerfile, int teamNumber) {
-    return {
-        stage("Build and Publish ${service} - Team ${teamNumber}") {
-            agent {
-                node {
-                    label "kaniko"
-                }
+    stage("Build and Publish ${service} - Team ${teamNumber}") {
+        agent {
+            node {
+                label "kaniko"
             }
-            steps {
-                script {
-                    def iValue = teamNumber.toString()
-                    def imageName = "${ECR_REPO}:${JOB_NAME_FORCED}${service.toLowerCase()}-dev-${BUILD_NUMBER}\$(printf \"%02d\" \${iValue})"
-                    sh """echo '{ "credsStore": "ecr-login" }' > /kaniko/.docker/config.json
-                        /kaniko/executor -f \$(pwd)/Dockerfiles/${dockerfile} -c \$(pwd) --insecure --skip-tls-verify --cache=false --destination=${imageName}
-                    """
-                }
+        }
+        steps {
+            script {
+                def iValue = teamNumber.toString()
+                def imageName = "${ECR_REPO}:${JOB_NAME_FORCED}${service.toLowerCase()}-dev-${BUILD_NUMBER}\$(printf \"%02d\" \${iValue})"
+                sh """echo '{ "credsStore": "ecr-login" }' > /kaniko/.docker/config.json
+                    /kaniko/executor -f \$(pwd)/Dockerfiles/${dockerfile} -c \$(pwd) --insecure --skip-tls-verify --cache=false --destination=${imageName}
+                """
             }
         }
     }
@@ -27,7 +25,7 @@ pipeline {
             for (int i = 1; i <= NUMBER_OF_TEAM.toInteger(); i++) {
                 for (service in services) {
                     def dockerfile = "Dockerfile_${service.toLowerCase()}"
-                    buildAndPublishStage(service, dockerfile, i).call()
+                    buildAndPublishStage(service, dockerfile, i)
                 }
             }
         }
