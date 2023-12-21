@@ -1,39 +1,28 @@
-def buildAndPublishStage(String service, String dockerfile, int teamNumber) {
-    stage("Build and Publish ${service} - Team ${teamNumber}") {
-        agent {
-            node {
-                label "kaniko"
-            }
-        }
-        steps {
-            script {
-                def iValue = teamNumber.toString()
-                def imageName = "${ECR_REPO}:${JOB_NAME_FORCED}${service.toLowerCase()}-dev-${BUILD_NUMBER}\$(printf \"%02d\" \${iValue})"
-                sh """echo '{ "credsStore": "ecr-login" }' > /kaniko/.docker/config.json
-                    /kaniko/executor -f \$(pwd)/Dockerfiles/${dockerfile} -c \$(pwd) --insecure --skip-tls-verify --cache=false --destination=${imageName}
-                """
-            }
-        }
+def buildAndPublish(imageName, dockerfile) {
+    container(name: 'kaniko') {
+        sh """echo '{ "credsStore": "ecr-login" }' > /kaniko/.docker/config.json
+            /kaniko/executor -f `pwd`/Dockerfiles/${dockerfile} -c `pwd` --insecure --skip-tls-verify --cache=false --destination=${imageName}
+        """
     }
 }
 
 pipeline {
-    agent {
-        label "kaniko"
-    }
+    agent none
+
     environment {
         ECR_REPO = '108174090253.dkr.ecr.us-east-1.amazonaws.com/production-support-course'
-        JOB_NAME_FORCED = 'c500team'
+        JOB_NAME = 'c500team'
         NUMBER_OF_TEAM = '60'
     }
 
     stages {
         script {
-            def services = ['DB', 'API', 'fe']
+            def services = ['fe', 'db', 'api']
             for (int i = 1; i <= NUMBER_OF_TEAM.toInteger(); i++) {
                 for (service in services) {
-                    def dockerfile = "Dockerfile_${service.toLowerCase()}"
-                    buildAndPublishStage(service, dockerfile, i)
+                    def imageName = "${ECR_REPO}:${JOB_NAME}${service}-dev-${BUILD_NUMBER}-team${String.format("%02d", i)}"
+                    def dockerfile = "Dockerfile_${service}"
+                    buildAndPublish(imageName, dockerfile)
                 }
             }
         }
