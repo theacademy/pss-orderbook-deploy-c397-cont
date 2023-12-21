@@ -1,58 +1,54 @@
 pipeline {
-  agent none
+  agent {
+    kubernetes {
+        yaml """\
+    apiVersion: v1
+    kind: Pod
+    metadata:
+      labels:
+        builder: promotion
+    spec:
+      serviceAccountName: jenkins-agent
+      containers:
+      - name: awscli
+        image: amazon/aws-cli
+        command:
+        - cat
+        tty: true
+    """.stripIndent()
+    }
+  }
   stages {
-    stage('Build and Publish DB') {
+    stage('Delete Old Images') {
       steps {
-        script {
-          for (int i = 1; i <= NUMBER_OF_TEAM.toInteger(); i++) {
-            node("kaniko-agent-${i}") {
-              container(name: 'kaniko') {
-                sh """echo '{ "credsStore": "ecr-login" }' > /kaniko/.docker/config.json
-                  /kaniko/executor -f \$(pwd)/Dockerfiles/Dockerfile_mysql -c \$(pwd) --insecure --skip-tls-verify --cache=false --destination=${ECR_REPO}:${JOB_NAME_FORCED}\$(printf "%02d" \${i})db-dev-${BUILD_NUMBER}
-                """
-              }
-            }
-          }
-        }
-      }
-    }
+          container(name: 'awscli') {
+            script{
+                sh '''
+                #!/bin/bash
+                
+                function delete_old_images() {
 
-    stage('Build and Publish API') {
-      steps {
-        script {
-          for (int i = 1; i <= NUMBER_OF_TEAM.toInteger(); i++) {
-            node("kaniko-agent-${i}") {
-              container(name: 'kaniko') {
-                sh """echo '{ "credsStore": "ecr-login" }' > /kaniko/.docker/config.json
-                  /kaniko/executor -f \$(pwd)/Dockerfiles/Dockerfile_fastapi -c \$(pwd) --insecure --skip-tls-verify --cache=false --destination=${ECR_REPO}:${JOB_NAME_FORCED}\$(printf "%02d" \${i})api-dev-${BUILD_NUMBER}
-                """
-              }
+                    local imagePattern=$1
+        
+                    #Get the number of images
+                    number_of_images=$(aws ecr list-images --repository-name production-support-course | grep -v Digest | grep "$imageName" | sed -n '=' | tail -1)
+                    
+                    #Get the list of images
+                    list_of_images=$(aws ecr list-images --repository-name production-support-course | grep -v Digest | grep "$imageName" | sort -V |  awk -F':' '{print$2}' | tr -d '"' | tr -d ' ' )
+                        for i in $list_of_images
+                        do
+                            aws ecr batch-delete-image --repository-name production-support-course --image-ids imageTag="$i"
+                        done;
+                }
+                delete_old_images "${imageName}"
+            '''
             }
-          }
-        }
-      }
-    }
-
-    stage('Build Trading Front End') {
-      steps {
-        script {
-          for (int i = 1; i <= NUMBER_OF_TEAM.toInteger(); i++) {
-            node("kaniko-agent-${i}") {
-              container(name: 'kaniko') {
-                sh """echo '{ "credsStore": "ecr-login" }' > /kaniko/.docker/config.json
-                  /kaniko/executor -f \$(pwd)/Dockerfiles/Dockerfile_nginx -c \$(pwd) --insecure --skip-tls-verify --cache=false --destination=${ECR_REPO}:${JOB_NAME_FORCED}\$(printf "%02d" \${i})fe-dev-${BUILD_NUMBER}
-                """
-              }
-            }
-          }
         }
       }
     }
   }
-
   environment {
     ECR_REPO = '108174090253.dkr.ecr.us-east-1.amazonaws.com/production-support-course'
-    JOB_NAME_FORCED = 'c500team'
-    NUMBER_OF_TEAM = '60'
+    imageName='c500'
   }
 }
