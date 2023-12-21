@@ -53,6 +53,6 @@ pipeline {
   environment {
     ECR_REPO = '108174090253.dkr.ecr.us-east-1.amazonaws.com/production-support-course'
     JOB_NAME_FORCED = 'c500team'
-    NUMBER_OF_TEAM = '60'
+    NUMBER_OF_TEAM = '20'
   }
 }
