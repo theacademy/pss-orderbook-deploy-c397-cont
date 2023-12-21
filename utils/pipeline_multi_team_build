@@ -1,30 +1,62 @@
-def buildAndPublish(imageName, dockerfile) {
-    container(name: 'kaniko') {
-        sh """echo '{ "credsStore": "ecr-login" }' > /kaniko/.docker/config.json
-            /kaniko/executor -f `pwd`/Dockerfiles/${dockerfile} -c `pwd` --insecure --skip-tls-verify --cache=false --destination=${imageName}
-        """
-    }
-}
-
 pipeline {
-    agent none
-
-    environment {
-        ECR_REPO = '108174090253.dkr.ecr.us-east-1.amazonaws.com/production-support-course'
-        JOB_NAME = 'c500team'
-        NUMBER_OF_TEAM = '60'
-    }
-
-    stages {
-        script {
-            def services = ['fe', 'db', 'api']
-            for (int i = 1; i <= NUMBER_OF_TEAM.toInteger(); i++) {
-                for (service in services) {
-                    def imageName = "${ECR_REPO}:${JOB_NAME}${service}-dev-${BUILD_NUMBER}-team${String.format("%02d", i)}"
-                    def dockerfile = "Dockerfile_${service}"
-                    buildAndPublish(imageName, dockerfile)
-                }
+  agent none
+  stages {
+    script {
+      for (int i = 1; i <= NUMBER_OF_TEAM.toInteger(); i++) {
+        stage('Build and Publish DB') {
+          agent {
+            node {
+              label "kaniko-db-${i}"
             }
+          }
+          steps {
+            container(name: "kaniko") {
+              def iValue = i.toString()
+              sh """echo '{ "credsStore": "ecr-login" }' > /kaniko/.docker/config.json
+                /kaniko/executor -f \$(pwd)/Dockerfiles/Dockerfile_mysql -c \$(pwd) --insecure --skip-tls-verify --cache=false --destination=${ECR_REPO}:${JOB_NAME_FORCED}\$(printf "%02d" ${iValue})db-dev-${BUILD_NUMBER}
+              """
+            }
+          }
         }
+
+        stage('Build and Publish API') {
+          agent {
+            node {
+              label "kaniko-api-${i}"
+            }
+          }
+          steps {
+            container(name: "kaniko") {
+              def iValue = i.toString()
+              sh """echo '{ "credsStore": "ecr-login" }' > /kaniko/.docker/config.json
+                /kaniko/executor -f \$(pwd)/Dockerfiles/Dockerfile_fastapi -c \$(pwd) --insecure --skip-tls-verify --cache=false --destination=${ECR_REPO}:${JOB_NAME_FORCED}\$(printf "%02d" ${iValue})api-dev-${BUILD_NUMBER}
+              """
+            }
+          }
+        }
+
+        stage('Build Trading Front End') {
+          agent {
+            node {
+              label "kaniko-fe-${i}"
+            }
+          }
+          steps {
+            container(name: "kaniko") {
+              def iValue = i.toString()
+              sh """echo '{ "credsStore": "ecr-login" }' > /kaniko/.docker/config.json
+                /kaniko/executor -f \$(pwd)/Dockerfiles/Dockerfile_nginx -c \$(pwd) --insecure --skip-tls-verify --cache=false --destination=${ECR_REPO}:${JOB_NAME_FORCED}\$(printf "%02d" ${iValue})fe-dev-${BUILD_NUMBER}
+              """
+            }
+          }
+        }
+      }
     }
+  }
+
+  environment {
+    ECR_REPO = '108174090253.dkr.ecr.us-east-1.amazonaws.com/production-support-course'
+    JOB_NAME_FORCED = 'c500team'
+    NUMBER_OF_TEAM = '60'
+  }
 }
