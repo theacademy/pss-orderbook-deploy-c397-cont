@@ -1,7 +1,7 @@
-def buildAndPublish(imageType) {
+def buildAndPublish(dockerfile, imageType, teamNumber) {
     container(name: "kaniko") {
         sh """echo '{ "credsStore": "ecr-login" }' > /kaniko/.docker/config.json
-            /kaniko/executor -f \$(pwd)/Dockerfiles/Dockerfile_${imageType} -c \$(pwd) --insecure --skip-tls-verify --cache=false --destination=${ECR_REPO}:${JOB_NAME_FORCED}${imageType}-dev-${BUILD_NUMBER}
+            /kaniko/executor -f \$(pwd)/Dockerfiles/Dockerfile_${dockerfile} -c \$(pwd) --insecure --skip-tls-verify --cache=false --destination=${ECR_REPO}:${JOB_NAME_FORCED}${teamNumber}${imageType}-dev-${BUILD_NUMBER}
         """
     }
 }
@@ -23,10 +23,10 @@ pipeline {
             steps {
                 script {
                     for (int i = 1; i <= NUMBER_OF_TEAM.toInteger(); i++) {
-                        def iValue = i.toString()
-                        buildAndPublish("db-${iValue}")
-                        buildAndPublish("api-${iValue}")
-                        buildAndPublish("fe-${iValue}")
+                        def teamNumber = String.format('%02d', i)
+                        buildAndPublish("mysql", "db", teamNumber)
+                        buildAndPublish("fastapi", "api", teamNumber)
+                        buildAndPublish("nginx", "fe",  teamNumber)
                         // Add more types if needed
                     }
                 }
