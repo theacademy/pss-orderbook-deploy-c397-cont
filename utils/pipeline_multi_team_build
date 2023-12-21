@@ -1,59 +1,33 @@
+def buildAndPublish(imageType) {
+    container(name: "kaniko") {
+        sh """echo '{ "credsStore": "ecr-login" }' > /kaniko/.docker/config.json
+            /kaniko/executor -f \$(pwd)/Dockerfiles/Dockerfile_${imageType} -c \$(pwd) --insecure --skip-tls-verify --cache=false --destination=${ECR_REPO}:${JOB_NAME_FORCED}${imageType}-dev-${BUILD_NUMBER}
+        """
+    }
+}
+
 pipeline {
     agent none
-
     environment {
         ECR_REPO = '108174090253.dkr.ecr.us-east-1.amazonaws.com/production-support-course'
         JOB_NAME_FORCED = 'c500team'
         NUMBER_OF_TEAM = '60'
     }
-
     stages {
-        script {
-            for (int i = 1; i <= NUMBER_OF_TEAM.toInteger(); i++) {
-                def iValue = String.format("%02d", i)
-
-                stage("Build and Publish DB ${iValue}") {
-                    agent {
-                        node {
-                            label "kaniko"
-                        }
-                    }
-                    steps {
-                        container(name: "kaniko") {
-                            sh """echo '{ "credsStore": "ecr-login" }' > /kaniko/.docker/config.json
-                                /kaniko/executor -f \$(pwd)/Dockerfiles/Dockerfile_mysql -c \$(pwd) --insecure --skip-tls-verify --cache=false --destination=${ECR_REPO}:${JOB_NAME_FORCED}${iValue}db-dev-${BUILD_NUMBER}
-                            """
-                        }
-                    }
+        stage('Build and Publish') {
+            agent {
+                node {
+                    label "kaniko"
                 }
-
-                stage("Build and Publish API ${iValue}") {
-                    agent {
-                        node {
-                            label "kaniko"
-                        }
-                    }
-                    steps {
-                        container(name: "kaniko") {
-                            sh """echo '{ "credsStore": "ecr-login" }' > /kaniko/.docker/config.json
-                                /kaniko/executor -f \$(pwd)/Dockerfiles/Dockerfile_fastapi -c \$(pwd) --insecure --skip-tls-verify --cache=false --destination=${ECR_REPO}:${JOB_NAME_FORCED}${iValue}api-dev-${BUILD_NUMBER}
-                            """
-                        }
-                    }
-                }
-
-                stage("Build Trading Front End ${iValue}") {
-                    agent {
-                        node {
-                            label "kaniko"
-                        }
-                    }
-                    steps {
-                        container(name: "kaniko") {
-                            sh """echo '{ "credsStore": "ecr-login" }' > /kaniko/.docker/config.json
-                                /kaniko/executor -f \$(pwd)/Dockerfiles/Dockerfile_nginx -c \$(pwd) --insecure --skip-tls-verify --cache=false --destination=${ECR_REPO}:${JOB_NAME_FORCED}${iValue}fe-dev-${BUILD_NUMBER}
-                            """
-                        }
+            }
+            steps {
+                script {
+                    for (int i = 1; i <= NUMBER_OF_TEAM.toInteger(); i++) {
+                        def iValue = i.toString()
+                        buildAndPublish("db-${iValue}")
+                        buildAndPublish("api-${iValue}")
+                        buildAndPublish("fe-${iValue}")
+                        // Add more types if needed
                     }
                 }
             }
