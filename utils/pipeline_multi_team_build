@@ -8,7 +8,7 @@ pipeline {
             node("kaniko-agent-${i}") {
               container(name: 'kaniko') {
                 sh """echo '{ "credsStore": "ecr-login" }' > /kaniko/.docker/config.json
-                  /kaniko/executor -f \$(pwd)/Dockerfiles/Dockerfile_mysql -c \$(pwd) --insecure --skip-tls-verify --cache=false --destination=${ECR_REPO}:${JOB_NAME_FORCED}$(printf "%02d" ${i})db-dev-${BUILD_NUMBER}
+                  /kaniko/executor -f \$(pwd)/Dockerfiles/Dockerfile_mysql -c \$(pwd) --insecure --skip-tls-verify --cache=false --destination=${ECR_REPO}:${JOB_NAME_FORCED}\$(printf "%02d" \${i})db-dev-${BUILD_NUMBER}
                 """
               }
             }
@@ -24,7 +24,7 @@ pipeline {
             node("kaniko-agent-${i}") {
               container(name: 'kaniko') {
                 sh """echo '{ "credsStore": "ecr-login" }' > /kaniko/.docker/config.json
-                  /kaniko/executor -f \$(pwd)/Dockerfiles/Dockerfile_fastapi -c \$(pwd) --insecure --skip-tls-verify --cache=false --destination=${ECR_REPO}:${JOB_NAME_FORCED}$(printf "%02d" ${i})api-dev-${BUILD_NUMBER}
+                  /kaniko/executor -f \$(pwd)/Dockerfiles/Dockerfile_fastapi -c \$(pwd) --insecure --skip-tls-verify --cache=false --destination=${ECR_REPO}:${JOB_NAME_FORCED}\$(printf "%02d" \${i})api-dev-${BUILD_NUMBER}
                 """
               }
             }
@@ -40,7 +40,7 @@ pipeline {
             node("kaniko-agent-${i}") {
               container(name: 'kaniko') {
                 sh """echo '{ "credsStore": "ecr-login" }' > /kaniko/.docker/config.json
-                  /kaniko/executor -f \$(pwd)/Dockerfiles/Dockerfile_nginx -c \$(pwd) --insecure --skip-tls-verify --cache=false --destination=${ECR_REPO}:${JOB_NAME_FORCED}$(printf "%02d" ${i})fe-dev-${BUILD_NUMBER}
+                  /kaniko/executor -f \$(pwd)/Dockerfiles/Dockerfile_nginx -c \$(pwd) --insecure --skip-tls-verify --cache=false --destination=${ECR_REPO}:${JOB_NAME_FORCED}\$(printf "%02d" \${i})fe-dev-${BUILD_NUMBER}
                 """
               }
             }
@@ -53,6 +53,6 @@ pipeline {
   environment {
     ECR_REPO = '108174090253.dkr.ecr.us-east-1.amazonaws.com/production-support-course'
     JOB_NAME_FORCED = 'c500team'
-    NUMBER_OF_TEAM = '40'
+    NUMBER_OF_TEAM = '60'
   }
 }
