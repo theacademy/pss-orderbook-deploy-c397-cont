@@ -99,12 +99,12 @@ peline {
   environment {
     ECR_REPO = '108174090253.dkr.ecr.us-east-1.amazonaws.com/production-support-course'
 
-    imageAPIDevName='c375jton-dev-'
-    imageAPIProdName='c375jtonapi-prod-'
-    imageDBDevName='c375jtondb-dev-'
-    imageDBProdName='c375jtondb-prod-'
-    imageFEDevName='c375jtonfe-dev-'
-    imageFEProdName='c375jtonfe-prod-'
+    imageAPIDevName='c375team02api-dev-'
+    imageAPIProdName='c375team02api-prod-'
+    imageDBDevName='c375team02db-dev-'
+    imageDBProdName='c375team02db-prod-'
+    imageFEDevName='c375team02fe-dev-'
+    imageFEProdName='c375team02fe-prod-'
     //imageSSHDevName='c001rickypssh-dev-'
     //imageSSHProdName='c001rickypssh-prod-'
     projectName='c375jton'
