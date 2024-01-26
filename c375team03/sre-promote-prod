@@ -25,7 +25,7 @@ pipeline {
     stage("Testing1") {
       steps {
           script{
-          sh './test1script.sh'
+          sh 'bash test1script.sh'
           
         }
 }
