@@ -22,6 +22,14 @@ pipeline {
 
 
   stages {
+stage('Trigger test1 pipeline file') {
+            steps {
+                script {
+                    build job: 'test1script'
+                }
+            }
+        }
+
 stage('Check home screen') {
             steps {
                 script {
