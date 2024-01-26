@@ -30,10 +30,10 @@ pipeline {
             }
         }
 
-        stage('Trigger Another Pipeline') {
+        stage('API tests for Dev app') {
             steps {
                 script {
-                    build job: 'c375team03BuildTest'
+                    build job: 'c375team03-API-Tests'
                 }
             }
         }
@@ -87,24 +87,7 @@ stage('Check home screen') {
                 }
             }
         }
-                        stage('Check /trade api'){
-            
-            steps{
-                script{
-                    sh """
-                    curl -X 'POST' \
-  'https://c375team03dev-api.computerlab.online/trade' \
-  -H 'accept: application/json' \
-  -H 'Content-Type: application/json' \
-  -d '{
-  "sessionid": "",
-  "uname": "",
-  "shares": 0,
-  "symbol": ""
-}'
-                    """
-                }
-            }
+                        
         }
     stage('Promote to Production') {
       steps {
