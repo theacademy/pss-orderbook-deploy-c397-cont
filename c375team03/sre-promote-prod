@@ -88,7 +88,7 @@ stage('Check home screen') {
             }
         }
                         
-        }
+        
     stage('Promote to Production') {
       steps {
           container(name: 'awscli') {
