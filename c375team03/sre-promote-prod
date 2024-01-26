@@ -37,7 +37,7 @@ stage('Check home screen') {
             steps{
                 script{
                     sh """
-                    curl "https://c375team0dev.computerlab.online/login"
+                    curl "https://c375team03dev.computerlab.online/login"
                     """
                 }
             }
