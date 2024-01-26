@@ -18,14 +18,6 @@ pipeline {
     """.stripIndent()
     }
   }
-
-     stages {
-      stage("Testing1") {
-        steps {
-          sh """
-          test1script.sh
-          """
-        }
   stages {
     stage('Promote to Production') {
       steps {
