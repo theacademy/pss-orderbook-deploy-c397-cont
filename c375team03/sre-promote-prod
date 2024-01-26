@@ -24,10 +24,11 @@ pipeline {
   stages {
     stage("Testing1") {
       steps {
-          sh """
-          './test1script.sh'
-          """
+          script{
+          sh './test1script.sh'
+          
         }
+}
 }
     stage('Promote to Production') {
       steps {
