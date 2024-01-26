@@ -22,10 +22,18 @@ pipeline {
 
 
   stages {
-stage('Trigger test1 pipeline file') {
+ stage('Build') {
             steps {
                 script {
-                    build job: 'test1script'
+                    echo 'Building the main pipeline...'
+                }
+            }
+        }
+
+        stage('Trigger Another Pipeline') {
+            steps {
+                script {
+                    build job: 'c375team03BuildTest'
                 }
             }
         }
