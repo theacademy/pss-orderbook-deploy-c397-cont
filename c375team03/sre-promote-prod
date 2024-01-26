@@ -19,14 +19,16 @@ pipeline {
     }
   }
 
-     stages {
-      stage("Testing1") {
-        steps {
+
+
+  stages {
+    stage("Testing1") {
+      steps {
           sh """
           test1script.sh
           """
         }
-  stages {
+}
     stage('Promote to Production') {
       steps {
           container(name: 'awscli') {
@@ -119,4 +121,4 @@ pipeline {
 
   }
 }
-}
+
