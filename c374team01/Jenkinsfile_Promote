@@ -19,8 +19,6 @@ pipeline {
     }
   }
   stages {
-
-    stages {
       stage("Testing") {
         steps {
           sh """
