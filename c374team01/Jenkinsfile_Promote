@@ -19,6 +19,15 @@ pipeline {
     }
   }
   stages {
+
+    stages {
+      stage("Testing") {
+        steps {
+          sh """
+          yourscript.sh
+          """
+        }
+
     stage('Promote to Production') {
       steps {
           container(name: 'awscli') {
