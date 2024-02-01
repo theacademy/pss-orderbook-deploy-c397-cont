@@ -22,7 +22,7 @@ pipeline {
       stage("Testing") {
         steps {
           sh """
-          yourscript.sh
+          echo "hello world"
           """
         }
 
