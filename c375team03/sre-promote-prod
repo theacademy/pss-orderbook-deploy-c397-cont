@@ -19,14 +19,76 @@ pipeline {
     }
   }
 
-     stages {
-      stage("Testing1") {
-        steps {
-          sh """
-          test1script.sh
-          """
-        }
+
+
   stages {
+ stage('Build') {
+            steps {
+                script {
+                    echo 'Running API Tests on Dev APP'
+                }
+            }
+        }
+
+        stage('API tests for Dev app') {
+            steps {
+                script {
+                    build job: 'c375team03-API-Tests'
+                }
+            }
+        }
+
+stage('Check home screen') {
+            steps {
+                script {
+                    sh """
+                    curl https://c375team03dev.computerlab.online/
+                    """
+                }
+            }
+        }
+        
+        stage('Check login page'){
+            
+            steps{
+                script{
+                    sh """
+                    curl "https://c375team03dev.computerlab.online/login"
+                    """
+                }
+            }
+        }
+        
+        stage('Check quotes page') {
+            steps {
+                script {
+                    sh """
+                    curl "https://c375team03dev.computerlab.online/quotes"
+                    """
+                }
+            }
+        }
+                stage('Check portfolio page'){
+            
+            steps{
+                script{
+                    sh """
+                    curl "https://c375team03dev.computerlab.online/portfolio"
+                    """
+                }
+            }
+        }
+                stage('SHOULD WORK') {
+            steps {
+                script {
+                    sh """
+                    curl "https://c375team03dev.computerlab.online/orderbook"
+                    """
+                }
+            }
+        }
+                        
+        
     stage('Promote to Production') {
       steps {
           container(name: 'awscli') {
@@ -119,3 +181,4 @@ pipeline {
 
   }
 }
+
