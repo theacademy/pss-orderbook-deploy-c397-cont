@@ -261,5 +261,5 @@ async def do_active_user(
 
 
 @app.post("/hello_moo")
-async def hello_moo():
+async def hello_moo()-> dict:
     return {"msg":"MOO"}
