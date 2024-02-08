@@ -45,7 +45,7 @@ pipeline {
         }
       }
     }
-    stage('Build and Publish DB') {
+    stage('Build Currency API') {
       agent {
         node {
           label 'kaniko'
