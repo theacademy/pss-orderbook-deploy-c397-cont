@@ -253,6 +253,7 @@ async def do_active_user(
     for k in keys:
         k = k.decode('utf-8') # make bytes into string
         # the keys with usernames look like "admin-sessionid"
+        
         if "-sessionid" in k: 
             users.append(k.replace("-sessionid", "")) # append only the username
 
