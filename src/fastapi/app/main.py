@@ -124,7 +124,7 @@ async def update_roles(
 
 @app.post("/new_feature")
 async def new_feature() -> dict:
-    return {"msg":"new_feature yay"}
+    return {"msg":"new_feature MOO"}
         
 
 @app.post("/trade")
