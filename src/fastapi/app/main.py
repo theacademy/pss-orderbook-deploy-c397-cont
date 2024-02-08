@@ -258,3 +258,8 @@ async def do_active_user(
             users.append(k.replace("-sessionid", "")) # append only the username
 
     return { "active-users" : users }
+
+
+@app.post("/hello_moo")
+async def hello_moo():
+    return {"msg":"MOO"}
