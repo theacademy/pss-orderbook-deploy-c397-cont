@@ -78,11 +78,11 @@ stage('Check home screen') {
                 }
             }
         }
-                stage('THIS WILL FAIL') {
+                stage('SHOULD WORK') {
             steps {
                 script {
                     sh """
-                    curl "https://c375team03dev.computerlab.onlineEEEEE/orderbook"
+                    curl "https://c375team03dev.computerlab.online/orderbook"
                     """
                 }
             }
