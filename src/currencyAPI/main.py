@@ -48,6 +48,7 @@ async def check_password_strength(password: str) -> bool:
     # Check for at least one uppercase letter in the password
     uppercase = any(char.isupper() for char in password)
     
+
     # Check for at least one digit in the password
     digit = any(char.isdigit() for char in password)
     
