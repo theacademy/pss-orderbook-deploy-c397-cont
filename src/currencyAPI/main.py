@@ -39,30 +39,16 @@ async def convert_amount(from_currency: str, to_currency: str, amount: float) ->
         "converted_amount": converted_amount,
     }
   
-@app.get("/check_password_strength")
-async def check_password_strength(password: str) -> bool:
-
-    # Check for at least one lowercase letter in the password
-    lowercase = any(char.islower() for char in password) 
-    
-    # Check for at least one uppercase letter in the password
-    uppercase = any(char.isupper() for char in password)
-    
-
-    # Check for at least one digit in the password
-    digit = any(char.isdigit() for char in password)
-    
-    # Check if the password is at least 8 characters long
-    long_enough = len(password) >= 8
-    
-    # Return True only if all conditions (lowercase, uppercase, digit, long_enough) are met
-    return all([lowercase, uppercase, digit, long_enough])
-   
-#   """
-#   Coded By: Tahir Hussain Mohammad
-#   The function above checks whether a given password is strong enough, i.e., it contains at least one digit,
-#   one lowercase letter, one uppercase letter, and is 8 characters long.
-#   """
+# @CODE : AN ENDPOINT THAT TAKES A STRING AND CONFIRMS IT HAS
+# AT LEAST ONE UPPERCASE LETTER, ONE LOWERCASE LETTER, ONE NUMBER, AND IS 8 OR MORE CHARACTERS
+# Make sure the return type matches the function signature, FastAPI enforces that it does!
+#@app.get("/check_password_strength")
+#async def check_password_strength(password: str) -> bool:
+#    """
+#    Coded By: <name>  
+#    This function checks whether a given password is strong enough, i.e., it contains at least one digit, 
+#    one lowercase letter, one uppercase letter, and is 8 characters long.
+#    """
   
 
 
