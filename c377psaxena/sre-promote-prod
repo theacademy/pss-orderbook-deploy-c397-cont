@@ -99,11 +99,11 @@ pipeline {
   environment {
     ECR_REPO = '108174090253.dkr.ecr.us-east-1.amazonaws.com/production-support-course'
 
-       imageAPIDevName='c377psaxenaapi-dev-'
+
     imageAPIProdName='c377psaxenaapi-prod-'
     imageDBDevName='c377psaxenadb-dev-'
     imageDBProdName='c377psaxenadb-prod-'
-    imageFEDevName='c377psaxenafe-dev-'
+    imageFEDevName='c377psaxena-dev-'
     imageFEProdName='c377psaxenafe-prod-'
     //imageSSHDevName='c001rickypssh-dev-'
     //imageSSHProdName='c001rickypssh-prod-'

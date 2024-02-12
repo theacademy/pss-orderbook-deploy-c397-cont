@@ -99,15 +99,15 @@ pipeline {
   environment {
     ECR_REPO = '108174090253.dkr.ecr.us-east-1.amazonaws.com/production-support-course'
 
-    imageAPIDevName='c377shrutiapi-dev-'
-    imageAPIProdName='c377shrutiapi-prod-'
-    imageDBDevName='c377shrutidb-dev-'
-    imageDBProdName='c377shrutidb-prod-'
-    imageFEDevName='c377shrutife-dev-'
-    imageFEProdName='c377shrutife-prod-'
-    //imageSSHDevName='c377shrutissh-dev-'
-    //imageSSHProdName='c377shrutissh-prod-'
-    projectName='c377shruti'
+    imageAPIDevName='c377hkesharwaniapi-dev-'
+    imageAPIProdName='c377hkesharwaniapi-prod-'
+    imageDBDevName='c377hkesharwanidb-dev-'
+    imageDBProdName='c377hkesharwanidb-prod-'
+    imageFEDevName='c377hkesharwanife-dev-'
+    imageFEProdName='c377hkesharwanife-prod-'
+    //imageSSHDevName='c377hkesharwani-dev-'
+    //imageSSHProdName='c377hkesharwani-prod-'
+    projectName='c377hkesharwani'
 
   }
 }
