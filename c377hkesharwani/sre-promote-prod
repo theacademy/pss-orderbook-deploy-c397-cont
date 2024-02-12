@@ -50,7 +50,7 @@ pipeline {
                 exitvalue="${exitvalue}2"
               fi
             fi
-
+            
             # Check Front End
             if [ $(aws ecr describe-images --repository-name production-support-course | grep "${imageFEProdName}${imgNum}" | wc -l) -eq 0 ]
             then
@@ -99,16 +99,15 @@ pipeline {
   environment {
     ECR_REPO = '108174090253.dkr.ecr.us-east-1.amazonaws.com/production-support-course'
 
-    imageAPIDevName='c377psaxena-dev-'
-    imageAPIProdName='c377psaxena-prod-'
-    imageDBDevName='c377psaxenadb-dev-'
-    imageDBProdName='c377psaxenadb-prod-'
-    imageFEDevName='c377psaxena-dev-'
-    imageFEProdName='c377psaxenafe-prod-'
-    //imageSSHDevName='c001rickypssh-dev-'
-    //imageSSHProdName='c001rickypssh-prod-'
-    projectName='c377psaxena'
-
+    imageAPIDevName='c377hkesharwaniapi-dev-'
+    imageAPIProdName='c377hkesharwaniapi-prod-'
+    imageDBDevName='c377hkesharwanidb-dev-'
+    imageDBProdName='c377hkesharwanidb-prod-'
+    imageFEDevName='c377hkesharwanife-dev-'
+    imageFEProdName='c377hkesharwanife-prod-'
+    //imageSSHDevName='c377hkesharwani-dev-'
+    //imageSSHProdName='c377hkesharwani-prod-'
+    projectName='c377hkesharwani'
 
   }
 }

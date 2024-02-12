@@ -101,13 +101,14 @@ pipeline {
 
     imageAPIDevName='c377psoniapi-dev-'
     imageAPIProdName='c377psoniapi-prod-'
-    imageDBDevName='c377psoniapi-dev-'
-    imageDBProdName='c377psoniapi-prod-'
-    imageFEDevName='c377psoniapi-dev-'
-    imageFEProdName='c377psoniapi-prod-'
-    //imageSSHDevName='c377psoniapi-dev-'
-    //imageSSHProdName='c377psoniapi-prod-'
-    projectName='c377psoniapi'
+    imageDBDevName='c377psonidb-dev-'
+    imageDBProdName='c377psonidb-prod-'
+    imageFEDevName='c377psonife-dev-'
+    imageFEProdName='c377psonife-prod-'
+    //imageSSHDevName='c001rickypssh-dev-'
+    //imageSSHProdName='c001rickypssh-prod-'
+    projectName='c377psoni'
+
 
   }
 }
