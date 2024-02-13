@@ -98,7 +98,7 @@ pipeline {
   }
   environment {
     ECR_REPO = '108174090253.dkr.ecr.us-east-1.amazonaws.com/production-support-course'
-    c377kparashar
+
     imageAPIDevName='c377kparasharapi-dev-'
     imageAPIProdName='c377kparasharapi-prod-'
     imageDBDevName='c377kparashardb-dev-'
@@ -111,4 +111,6 @@ pipeline {
 
   }
 }
+
+
 
