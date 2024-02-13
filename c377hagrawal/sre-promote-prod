@@ -60,7 +60,7 @@ pipeline {
                 exitvalue=3
               fi
             fi
-​
+
             # Check SSH
             #if [ $(aws ecr describe-images --repository-name production-support-course | grep "${imageSSHProdName}${imgNum}" | wc -l) -eq 0 ]
             #then
@@ -70,7 +70,7 @@ pipeline {
                 #exitvalue=3
               #fi
             #fi
-​
+
           case ${exitvalue} in
             0) echo "Update OK"
                ;;
@@ -89,7 +89,7 @@ pipeline {
             123) echo "All images failed to push to repository"
                ;;
           esac
-​
+
           exit ${exitvalue}
 '''
         }
@@ -98,16 +98,16 @@ pipeline {
   }
   environment {
     ECR_REPO = '108174090253.dkr.ecr.us-east-1.amazonaws.com/production-support-course'
-​
-    //this section contain the image name pattern for your team 
-    imageAPIDevName='c377hagrawalapi-dev-'
+
+    imageAPIDevName='c377hagrawalpi-dev-'
     imageAPIProdName='c377hagrawalapi-prod-'
     imageDBDevName='c377hagrawaldb-dev-'
     imageDBProdName='c377hagrawaldb-prod-'
     imageFEDevName='c377hagrawalfe-dev-'
     imageFEProdName='c377hagrawalfe-prod-'
-    //imageSSHDevName='c377hagrawalssh-dev-'
-    //imageSSHProdName='c377hagrawalssh-prod-'
+    //imageSSHDevName='c374rickypssh-dev-'
+    //imageSSHProdName='c374rickypssh-prod-'
     projectName='c377hagrawal'
+
   }
 }
