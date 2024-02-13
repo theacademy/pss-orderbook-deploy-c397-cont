@@ -105,8 +105,8 @@ pipeline {
     imageDBProdName='c377ayejjaladb-prod-'
     imageFEDevName='c377ayejjalafe-dev-'
     imageFEProdName='c377ayejjalafe-prod-'
-    //imageSSHDevName='c377ayejjalassh-dev-'
-    //imageSSHProdName='c377ayejjalassh-prod-'
+    //imageSSHDevName='c001rickypssh-dev-'
+    //imageSSHProdName='c001rickypssh-prod-'
     projectName='c377ayejjala'
 
   }
