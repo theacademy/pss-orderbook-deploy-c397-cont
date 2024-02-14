@@ -45,20 +45,7 @@ pipeline {
         }
       }
     }
-    stage('Build Currency API') {
-      agent {
-        node {
-          label 'kaniko'
-        }
-      }
-      steps {
-        container(name: 'kaniko') {
-          sh '''echo \'{ "credsStore": "ecr-login" }\' > /kaniko/.docker/config.json
-/kaniko/executor -f `pwd`/Dockerfiles/Dockerfile_currencyAPI -c `pwd` --insecure --skip-tls-verify --cache=false --destination=${ECR_REPO}:${JOB_NAME}currency-api-dev-${BUILD_NUMBER}'''
-        }
-      }
-    }
-  }
+
 
   environment {
     ECR_REPO = '108174090253.dkr.ecr.us-east-1.amazonaws.com/production-support-course'
