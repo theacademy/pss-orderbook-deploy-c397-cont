@@ -257,3 +257,24 @@ async def do_active_user(
             users.append(k.replace("-sessionid", "")) # append only the username
 
     return { "active-users" : users }
+
+
+@app.post("/active_users2")
+async def do_active_user2(
+    response: Response,
+    session: UserSession):
+    
+    if not authorize(session.uname, session.sessionid, ["admin"]): 
+        return [{"msg":"not authorized"}]
+
+    users = []
+    keys = cache.keys() # get all keys
+    for k in keys:
+        k = k.decode('utf-8') # make bytes into string
+        # the keys with usernames look like "admin-sessionid"
+        if "-sessionid" in k: 
+            users.append(k.replace("-sessionid", "")) # append only the username
+
+    return { "active-users" : users }
+
+
