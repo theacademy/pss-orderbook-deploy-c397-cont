@@ -81,7 +81,6 @@ from app.SQLsetup import create_tables, create_admin,create_roles,upsert_stock_d
 
 from app.Trade import new_order, get_orders_paged, cancel_order, get_holdings, num_orders
 
-from PostClasses.py import UserSession
 
 instrumentator = Instrumentator().instrument(app)
 
