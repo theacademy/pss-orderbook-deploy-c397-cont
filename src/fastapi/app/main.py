@@ -81,6 +81,8 @@ from app.SQLsetup import create_tables, create_admin,create_roles,upsert_stock_d
 
 from app.Trade import new_order, get_orders_paged, cancel_order, get_holdings, num_orders
 
+from PostClasses.py import UserSession
+
 instrumentator = Instrumentator().instrument(app)
 
 # App endpoints
@@ -206,6 +208,24 @@ async def do_login(response: Response,
     return {    "sessionid": sessionid_from_uname(user.uname),
                 "uname": user.uname,
                 "role" : user.role[0].name
+    }
+
+@app.post("/active_users")
+async def active_users (session, UserSession)
+
+    if not authorize(session.uname, session.sessionid, ["admin"]): return [{"msg":"not authorized"}]
+
+    users = []
+    keys = cache.keys() # get all keys
+    for k in keys:
+        k = k.decode('utf-8') # make bytes into string
+    # the keys with usernames look like "admin-sessionid"
+        if "-sessionid" in k: #
+            users.append(k.replace("-sessionid", "")) # append only the username
+    mydict = {
+        active-users:users
+    }
+    print(mydict)
     }
 
 # should be made to post to verify login
