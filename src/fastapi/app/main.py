@@ -124,7 +124,7 @@ async def update_roles(
 
 @app.post("/new_feature")
 async def new_feature() -> dict:
-    return {"msg":"new_feature yay"}
+    return {"msg":"new_feature MOO"}
         
 
 @app.post("/trade")
@@ -253,6 +253,7 @@ async def do_active_user(
     for k in keys:
         k = k.decode('utf-8') # make bytes into string
         # the keys with usernames look like "admin-sessionid"
+        
         if "-sessionid" in k: 
             users.append(k.replace("-sessionid", "")) # append only the username
 

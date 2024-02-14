@@ -18,80 +18,7 @@ pipeline {
     """.stripIndent()
     }
   }
-
-
-
   stages {
-
-
-stage('Build') {
-           steps {
-
-                script {
-                    echo 'Running API Tests on Dev APP'
-                }
-            }
-        }
-
-        stage('API tests for Dev app') {
-            steps {
-                script {
-                    build job: 'c375team03-API-Tests'
-                }
-            }
-        }
-
-stage('Check home screen') {
-            steps {
-                script {
-                    sh """
-                    curl https://c375team03dev.computerlab.online/
-                    """
-                }
-            }
-        }
-        
-        stage('Check login page'){
-            
-            steps{
-                script{
-                    sh """
-                    curl "https://c375team03dev.computerlab.online/login"
-                    """
-                }
-            }
-        }
-        
-        stage('Check quotes page') {
-            steps {
-                script {
-                    sh """
-                    curl "https://c375team03dev.computerlab.online/quotes"
-                    """
-                }
-            }
-        }
-                stage('Check portfolio page'){
-            
-            steps{
-                script{
-                    sh """
-                    curl "https://c375team03dev.computerlab.online/portfolio"
-                    """
-                }
-            }
-        }
-                stage('SHOULD WORK') {
-            steps {
-                script {
-                    sh """
-                    curl "https://c375team03dev.computerlab.online/orderbook"
-                    """
-                }
-            }
-        }
-                        
-        
     stage('Promote to Production') {
       steps {
           container(name: 'awscli') {
@@ -172,16 +99,15 @@ stage('Check home screen') {
   environment {
     ECR_REPO = '108174090253.dkr.ecr.us-east-1.amazonaws.com/production-support-course'
 
-    imageAPIDevName='c375team03api-dev-'
-    imageAPIProdName='c375team03api-prod-'
-    imageDBDevName='c375team03db-dev-'
-    imageDBProdName='c375team03db-prod-'
-    imageFEDevName='c375team03fe-dev-'
-    imageFEProdName='c375team03fe-prod-'
-    //imageSSHDevName='c001rickypssh-dev-'
-    //imageSSHProdName='c001rickypssh-prod-'
-    projectName='c375team03'
+    imageAPIDevName='c377rbaghelapi-dev-'
+    imageAPIProdName='c377rbaghelapi-prod-'
+    imageDBDevName='c377rbagheldb-dev-'
+    imageDBProdName='c377rbagheldb-prod-'
+    imageFEDevName='c377rbaghelfe-dev-'
+    imageFEProdName='c377rbaghelfe-prod-'
+    //imageSSHDevName='c377rbaghelssh-dev-'
+    //imageSSHProdName='c377rbaghelssh-prod-'
+    projectName='c377rbaghel'
 
   }
 }
-

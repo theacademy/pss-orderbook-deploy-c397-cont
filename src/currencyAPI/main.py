@@ -49,6 +49,7 @@ async def convert_amount(from_currency: str, to_currency: str, amount: float) ->
 #    This function checks whether a given password is strong enough, i.e., it contains at least one digit, 
 #    one lowercase letter, one uppercase letter, and is 8 characters long.
 #    """
+  
 
 
 # @CODE : ADD ENDPOINT TO LIST ALL AVAILABLE CURRENCIES  

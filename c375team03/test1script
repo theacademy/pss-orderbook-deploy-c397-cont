@@ -1,0 +1,24 @@
+pipeline {
+    agent {
+        node {
+            label 'generic-agent'
+        }
+    }
+    stages {
+       
+      
+                stage('Check /stock_quote AAPL') {
+            steps {
+                script {
+                    sh """
+                    curl -X 'GET' \
+  'https://c375team03dev-api.computerlab.online/stock_quote?symbol=AAPL' \
+  -H 'accept: application/json'
+                    """
+                }
+            }
+        }
+                        
+        }
+    }
+}
