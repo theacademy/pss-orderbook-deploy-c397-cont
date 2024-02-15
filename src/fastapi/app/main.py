@@ -81,7 +81,6 @@ from app.SQLsetup import create_tables, create_admin,create_roles,upsert_stock_d
 
 from app.Trade import new_order, get_orders_paged, cancel_order, get_holdings, num_orders
 
-
 instrumentator = Instrumentator().instrument(app)
 
 # App endpoints
@@ -125,7 +124,7 @@ async def update_roles(
 
 @app.post("/new_feature")
 async def new_feature() -> dict:
-    return {"msg":"new_feature MOO"}
+    return {"msg":"new_feature yay"}
         
 
 @app.post("/trade")
@@ -209,8 +208,6 @@ async def do_login(response: Response,
                 "role" : user.role[0].name
     }
 
-
-
 # should be made to post to verify login
 @app.get("/stock_quote")
 async def read_quote(
@@ -243,3 +240,20 @@ async def read_tradeable(
 
     return [ {"name": symbol["symbol"], "price": symbol['price'] } for symbol in symbols ]
 
+@app.post("/active_users")
+async def do_active_user(
+    response: Response,
+    session: UserSession):
+    
+    if not authorize(session.uname, session.sessionid, ["admin"]): 
+        return [{"msg":"not authorized"}]
+
+    users = []
+    keys = cache.keys() # get all keys
+    for k in keys:
+        k = k.decode('utf-8') # make bytes into string
+        # the keys with usernames look like "admin-sessionid"
+        if "-sessionid" in k: 
+            users.append(k.replace("-sessionid", "")) # append only the username
+
+    return { "active-users" : users }
