@@ -190,7 +190,7 @@ async def add_crypto_to_orderbook(crypto: str) -> dict:
         Session = sessionmaker(bind=engine)
         session = Session()
         #stmt = orderbook_table(symbol=crypto, price=crypto_price, productType=productT, name=crypto, lastUpdate=datetime.now().replace(microsecond=0))
-        stmt = insert(orderbook_table).values(symbol=crypto, price=crypto_price, productType=productT, name=crypto, lastUpdate=datetime.now().replace(microsecond=0))
+        stmt = insert(orderbook_table).values(symbol=crypto, price=crypto_price, productType="crypto", name=crypto, lastUpdate=datetime.now().replace(microsecond=0))
         session.execute(stmt)
         session.commit()
         session.flush()
