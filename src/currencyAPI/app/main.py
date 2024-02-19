@@ -87,7 +87,11 @@ async def available_crypto() -> dict:
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
-async def get_USD_rate() -> dict:
+async def get_usd_rate() -> dict:
+    # """
+    # Coded by: Tomasz Wisniewski
+    # This endpoint allows you to see what crypto-currencies are available
+    # """
     response = requests.get(f"{COINBASE_RATES}")
     if response.status_code == 200:
         data = response.json()
@@ -97,18 +101,18 @@ async def get_USD_rate() -> dict:
    
 @app.get("/convert_crypto")
 async def convert_crypto(from_crypto: str, to_currency: str, amount: float) -> dict:
-#    """
-#    Coded by: Tomasz Wisniewski
-#    This endpoint allows you to get a quote for a crypto in any supported currency  
-#    @from_crypto - chose a crypto currency (eg. BTC, or ETH)  
-#    @to_currency - chose a currency to obtain the price in (eg. USD, or CAD)  
-#    """
-    crypto_rate = await get_USD_rate()
+    # """
+    # Coded by: Tomasz Wisniewski
+    # This endpoint allows you to see what crypto-currencies are available
+    # """
+    crypto_rate = await get_usd_rate()
     ex_rate = await exchange_rate(to_currency, "USD")
     rate_to_USD = float(ex_rate["exchange_rate"])
     rate_from_USD = float(crypto_rate['rates'][from_crypto])
     rate_crypto = rate_to_USD * rate_from_USD
-    converted_amount = amount * rate_crypto
+    converted_amount = (1/rate_crypto)* amount
+    print(rate_to_USD)
+    print(rate_from_USD)
     return {
         "crypto_currency": from_crypto.upper(),
         "fiat_currency": to_currency.upper(),
@@ -121,23 +125,16 @@ async def convert_crypto(from_crypto: str, to_currency: str, amount: float) -> d
 #The code below starts you off using SQLAlchemy ORM
 #Dependencies should already be installed from your requirements.txt file
 #Using the ORM instead of raw SQL is safer and less coupled: it is best practice!
+ 
 @app.get("/update_orderbookdb_asset_price")
 async def update_orderbookdb_asset_price(symbol: str, new_price: float) -> dict:
-    """
-    Coded by: <name>  
-    This endpoint allows us to update the price of the assets in the app  
-    @symbol - pick a symbol to update the price of in the orderbook app  
-    @new_price - The new price of the symbol  
-    """
-   
-    # import sqlalchemy
+    # """
+    # Coded by: Tomasz Wisniewski
+    # This endpoint allows you to see what crypto-currencies are available
+    # """
     from sqlalchemy import create_engine, Table, Column, String, DateTime, Numeric, update, MetaData
     from sqlalchemy.orm import sessionmaker
-   
-    # create an engine for building sessions
     engine = create_engine('mysql+pymysql://wiley:wiley123@a11e83d0d11d64c75a070bf9a91b8c6c-1320554700.us-east-1.elb.amazonaws.com/orderbook')
- 
-    # create an ORM object that maps to the Product table
     metadata = MetaData()
     product_table = Table('Product', metadata,
         Column('symbol', String(16), primary_key=True),
@@ -147,16 +144,10 @@ async def update_orderbookdb_asset_price(symbol: str, new_price: float) -> dict:
         Column('lastUpdate', DateTime)
     )
     metadata.create_all(engine)
- 
-    # create a database session maker
     Session = sessionmaker(bind=engine)
- 
     try:
-        # Instantiate the session
         session = Session()
-        # create the statement to udpate
         stmt = update(product_table).where(product_table.c.symbol == symbol).values(price=new_price)
-        # execute commit and flush the statement
         session.execute(stmt)
         session.commit()
         session.flush()
@@ -172,22 +163,19 @@ async def update_orderbookdb_asset_price(symbol: str, new_price: float) -> dict:
 #       You will need to use the await keyword to wait for the result (otherwise it will run async and not wait for the result)
  
 @app.get("/add_crypto_to_orderbook")
-#async def add_crypto_to_orderbook(symbol: str) -> dict:
-#    """
-#     Coded by: Tomasz Wisniewski
-#     This endpoint uses the `convert_crypto` function above to get the price of a crypto-currency  
-#     and inserts that currency and price into the orderbook database
-#    """
 async def add_crypto_to_orderbook(crypto: str) -> dict:
-   
+    # """
+    # Coded by: Tomasz Wisniewski
+    # This endpoint allows you to see what crypto-currencies are available
+    # """
     from sqlalchemy import create_engine, Table, Column, String, DateTime, Numeric, insert, MetaData
     from sqlalchemy.orm import sessionmaker
+    from datetime import datetime
     from decimal import Decimal
     engine = create_engine('mysql+pymysql://wiley:wiley123@a11e83d0d11d64c75a070bf9a91b8c6c-1320554700.us-east-1.elb.amazonaws.com/orderbook')
     crypto_data = await convert_crypto(crypto, "USD", 1)
-    crypto_price = float(crypto_data["crypto_rate"])
- 
-    # Insert into orderbook database
+    #crypto_price = float(crypto_data["crypto_rate"])
+    crypto_price = Decimal(crypto_data["crypto_rate"]).quantize (Decimal ('.01'))
     try:
         metadata = MetaData()
         orderbook_table = Table('Product', metadata,
@@ -197,17 +185,19 @@ async def add_crypto_to_orderbook(crypto: str) -> dict:
             Column('name', String(128)),
             Column('lastUpdate', DateTime)
         )
+        productT="Crypto"
+        print(crypto)
+        print(crypto_price)
+        print(productT)
+        print(datetime.now().replace(microsecond=0))
         metadata.create_all(engine)
         Session = sessionmaker(bind=engine)
         session = Session()
- 
-        # Insert data into orderbook table
-        stmt = insert(orderbook_table).values(symbol=crypto, price=crypto_price, productType="Crypto", name=crypto, lastUpdate=DateTime)
-        #stmt = insert(symbol=crypto, price=crypto_price, productType="Crypto", name=crypto, lastUpdate=DateTime)
+        #stmt = orderbook_table(symbol=crypto, price=crypto_price, productType=productT, name=crypto, lastUpdate=datetime.now().replace(microsecond=0))
+        stmt = insert(orderbook_table).values(symbol=crypto, price=crypto_price, productType=productT, name=crypto, lastUpdate=datetime.now().replace(microsecond=0))
         session.execute(stmt)
         session.commit()
         session.flush()
- 
         return {"insert_report": "success", "symbol": crypto}
     except Exception as e:
         raise HTTPException(status_code=400, detail="An error occurred while inserting into orderbook")
