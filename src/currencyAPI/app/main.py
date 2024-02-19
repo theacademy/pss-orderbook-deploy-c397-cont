@@ -87,7 +87,7 @@ async def available_crypto() -> dict:
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
-async def get_crypto_rate() -> dict:
+async def get_USD_rate() -> dict:
     response = requests.get(f"{COINBASE_RATES}")
     if response.status_code == 200:
         data = response.json()
@@ -103,7 +103,7 @@ async def convert_crypto(from_crypto: str, to_currency: str, amount: float) -> d
 #    @from_crypto - chose a crypto currency (eg. BTC, or ETH)  
 #    @to_currency - chose a currency to obtain the price in (eg. USD, or CAD)  
 #    """
-    crypto_rate = await get_crypto_rate()
+    crypto_rate = await get_USD_rate()
     ex_rate = await exchange_rate(to_currency, "USD")
     rate_to_USD = float(ex_rate["exchange_rate"])
     rate_from_USD = float(crypto_rate['rates'][from_crypto])
