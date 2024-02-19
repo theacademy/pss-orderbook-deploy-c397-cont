@@ -185,11 +185,7 @@ async def add_crypto_to_orderbook(crypto: str) -> dict:
             Column('name', String(128)),
             Column('lastUpdate', DateTime)
         )
-        productT="Crypto"
-        print(crypto)
-        print(crypto_price)
-        print(productT)
-        print(datetime.now().replace(microsecond=0))
+      
         metadata.create_all(engine)
         Session = sessionmaker(bind=engine)
         session = Session()
