@@ -57,7 +57,7 @@ async def check_password_strength(password: str) -> dict:
 
 @app.get("/available_currencies")
 async def available_currencies() -> dict:
-    # Takes the data from API, civerts it to a JSON format and extracts "id" and "data"
+    # Takes the data from API, converts it to a JSON format and extracts "id" and "data"
     try:
         response = requests.get(COINBASE_FIAT)
         if response.status_code == 200:
@@ -91,34 +91,37 @@ async def available_crypto() -> dict:
 async def get_usd_rate() -> dict:
     # """
     # Coded by: Tomasz Wisniewski
-    # This function download rates for USD currency.
+    # This function downloads rates for USD currency.
     # """
     response = requests.get(f"{COINBASE_RATES}")
     if response.status_code == 200:
         data = response.json()
         return data["data"]
     else:
-        raise HTTPException(status_code=400, detail="Failed to fetch crypto rate")
-
+        raise HTTPException(status_code=400, detail="Failed to fetch USD rates")
+   
 @app.get("/convert_crypto")
 async def convert_crypto(from_crypto: str, to_currency: str, amount: float) -> dict:
     # """
     # Coded by: Tomasz Wisniewski
     # This endpoint allows you to convert crypto into any currency.
     # """
-    crypto_rate = await get_usd_rate()
-    ex_rate = await exchange_rate(to_currency, "USD")
-    rate_to_USD = float(ex_rate["exchange_rate"])
-    rate_from_USD = float(crypto_rate['rates'][from_crypto])
-    rate_crypto = rate_to_USD * rate_from_USD
-    converted_amount = (1/rate_crypto)* amount
-    return {
-        "crypto_currency": from_crypto.upper(),
-        "fiat_currency": to_currency.upper(),
-        "crypto_rate": rate_crypto,
-        "amount": amount,
-        "converted_amount": converted_amount,
-    }
+    try:
+        crypto_rate = await get_usd_rate()
+        ex_rate = await exchange_rate(to_currency, "USD")
+        rate_to_USD = float(ex_rate["exchange_rate"])
+        rate_from_USD = float(crypto_rate['rates'][from_crypto])
+        rate_crypto = rate_to_USD * rate_from_USD
+        converted_amount = (1/rate_crypto)* amount
+        return {
+            "crypto_currency": from_crypto.upper(),
+            "fiat_currency": to_currency.upper(),
+            "crypto_rate": rate_crypto,
+            "amount": amount,
+            "converted_amount": converted_amount,
+        }
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
  
 #@CODE : ADD ENDPOINT TO UPDATE PRICE OF ASSET IN ORDERBOOK DB
 #The code below starts you off using SQLAlchemy ORM
@@ -161,23 +164,27 @@ async def update_orderbookdb_asset_price(symbol: str, new_price: float) -> dict:
 async def get_crypto_name(crypto_n: str) -> str:
     # """
     # Coded by: Tomasz Wisniewski
-    # This function download all crypto names and extract required name.
+    # This function downloads all crypto names and extract required name.
     # """
     get_crypto_names = await available_crypto()
-    crypto_names = get_crypto_names["Crypto curriences :"]
-    for crypto_name in crypto_names:
-        if crypto_name["Crypto ID :"] == crypto_n:
-            c_name = crypto_name["Crypto name : "]
-            return c_name
+    if get_crypto_names.status_code == 200:
+        crypto_names = get_crypto_names["Crypto curriences :"]
+        for crypto_name in crypto_names:
+            if crypto_name["Crypto ID :"] == crypto_n:
+                c_name = crypto_name["Crypto name : "]
+                return c_name
+    else:
+        raise HTTPException(status_code=400, detail="Failed to fetch crypto name")
+       
 # @CODE : ADD ENDPOINT FOR INSERTING A CRYPTO CURRENCY INTO THE ORDERBOOK APP
 # HINT: Make use of the convert_crypto function from above!
 #       You will need to use the await keyword to wait for the result (otherwise it will run async and not wait for the result)
 @app.get("/add_crypto_to_orderbook")
-async def add_crypto_to_orderbook(crypto: str) -> dict:
     # """
     # Coded by: Tomasz Wisniewski
-    # This endpoint allows you insert a crypto currency into the orderbook app
+    # This endpoint will insert a crypto currency into the orderbook app.
     # """
+async def add_crypto_to_orderbook(crypto: str) -> dict:
     from sqlalchemy import create_engine, Table, Column, String, DateTime, Numeric, insert, MetaData
     from sqlalchemy.orm import sessionmaker
     from datetime import datetime
@@ -185,7 +192,6 @@ async def add_crypto_to_orderbook(crypto: str) -> dict:
     engine = create_engine('mysql+pymysql://wiley:wiley123@a11e83d0d11d64c75a070bf9a91b8c6c-1320554700.us-east-1.elb.amazonaws.com/orderbook')
     crypto_data = await convert_crypto(crypto, "USD", 1)
     c_name = await get_crypto_name(crypto)
-    #crypto_price = float(1/crypto_data["crypto_rate"])
     crypto_price = Decimal(1/crypto_data["crypto_rate"]).quantize (Decimal ('.01'))
     try:
         metadata = MetaData()
@@ -206,3 +212,5 @@ async def add_crypto_to_orderbook(crypto: str) -> dict:
         return {"insert_report": "success", "symbol": crypto}
     except Exception as e:
         raise HTTPException(status_code=400, detail="An error occurred while inserting into orderbook")
+    finally:
+        session.close()
