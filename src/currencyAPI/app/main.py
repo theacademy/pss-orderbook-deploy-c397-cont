@@ -1,12 +1,14 @@
 from fastapi import FastAPI, HTTPException
 import requests
+from datetime import *
  
 app = FastAPI()
  
-API_BASE_URL = "https://api.exchangerate-api.com/v4/latest/"
+API_BASE_URL = "https://v6.exchangerate-api.com/v6/2d6661dc484a71b2ec96d0f6/latest/USD"
 COINBASE_API_URL = "https://api.coinbase.com/v2/currencies/crypto"
 COINBASE_RATES = "https://api.coinbase.com/v2/exchange-rates/"
 COINBASE_FIAT = "https://api.coinbase.com/v2/currencies"
+FREECURRENCYAPI = "https://api.freecurrencyapi.com/v1/historical?apikey=fca_live_7dHeSfDiffz0YIQcp86XBN45JExNt6GHsDY9n5m0"
  
 
 async def get_exchange_rate(from_currency: str, to_currency: str) -> float:
@@ -44,16 +46,19 @@ async def convert_amount(from_currency: str, to_currency: str, amount: float) ->
 
 @app.get("/check_password_strength")
 async def check_password_strength(password: str) -> dict:
+   
+    #coded by: Philip Hushani
+    specialc = '!@£$%^#&*()_-~?><'
     p_uppercase = any(char.isupper() for char in password)
     p_lowercase = any(char.islower() for char in password)
     p_digit = any(char.isdigit() for char in password)
     plength = len(password) >= 8
+    special_c = any(char in specialc for char in password)
  
     return {
-        "User_has_strong_password": p_uppercase and p_lowercase and p_digit and plength
+        "User_has_strong_password": p_uppercase and p_lowercase and p_digit and plength and special_c
     }
-    # Coded by  Philip Hushani
- 
+
 
 @app.get("/available_currencies")
 async def available_currencies() -> dict:
@@ -214,3 +219,95 @@ async def add_crypto_to_orderbook(crypto: str) -> dict:
         raise HTTPException(status_code=400, detail="An error occurred while inserting into orderbook")
     finally:
         session.close()
+
+@app.get("/check_crypto")
+async def check_crypto(crypto_param: str) -> dict:
+    try:
+        response = requests.get(COINBASE_API_URL)
+        if response.status_code == 200:
+            data = response.json()
+            crypto_codes = [currency["code"] for currency in data["data"]]
+            crypto_names = [currency["name"] for currency in data["data"]]
+           
+            if crypto_param in crypto_codes or crypto_param in crypto_names:
+                return {"message": "This crypto currency is tradable"}
+            else:
+                return {"error_message": "This crypto currency is not tradable"}
+        else:
+            raise HTTPException(status_code=400, detail="Failed to fetch crypto currencies")
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+   
+ 
+@app.get("/convert_crypto")
+async def convert_crypto(from_crypto: str, to_currency: str, amount: float) -> dict:
+    # """
+    # Coded by: Tomasz Wisniewski
+    # This endpoint allows you to convert crypto into any currency.
+    # """
+    try:
+        check_result = await check_crypto(from_crypto)
+        if "error_message" in check_result:
+            raise HTTPException(status_code=404, detail=check_result["error_message"])
+ 
+        crypto_rate = await get_usd_rate()
+        ex_rate = await exchange_rate(to_currency, "USD")
+        rate_to_USD = float(ex_rate["exchange_rate"])
+        rate_from_USD = float(crypto_rate['rates'][from_crypto])
+        rate_crypto = rate_to_USD * rate_from_USD
+        converted_amount = (1 / rate_crypto) * amount
+        return {
+            "crypto_currency": from_crypto.upper(),
+            "fiat_currency": to_currency.upper(),
+            "crypto_rate": rate_crypto,
+            "amount": amount,
+            "converted_amount": converted_amount,
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+async def get_historical_data(currency: str) -> dict:
+    # """
+    # Coded by: Tomasz Wisniewski
+    # This function downloads historical rate against USD for required currency.
+    # """
+    response = requests.get(f"{FREECURRENCYAPI}&base_currency=USD&currencies={currency}")
+    if response.status_code == 200:
+        data = response.json()
+        return data["data"]
+    else:
+        raise HTTPException(status_code=400, detail="Failed to fetch USD the historical data")
+ 
+@app.get("/check_yesterdays_price")
+async def check_yesterdays_price(currency: str) -> dict:
+    # """
+    # Coded by: Tomasz Wisniewski and Bette Beament
+    # This endpoint will compare current price with the price from previous day against USD
+    # """
+    y_day = []
+    today_d = date.today()
+    y_day.append(today_d - timedelta(days = 1))
+    yesterday = y_day[0]
+    try:
+        old_data = await get_historical_data(currency)
+        old_price = old_data[str(yesterday)][currency.upper()]
+        #print(old_data)
+        new_data = await exchange_rate("USD", currency)
+        new_price = new_data['exchange_rate']
+ 
+        if old_price > new_price:
+            return {"message": f"{currency} is worth more than yesterday (in USD)."}
+        if old_price < new_price:
+            return {"message": f"{currency} is worth less than yesterday (in USD)."}
+        else:
+            return {"message": f"{currency} price hasn't change since yesterday (in USD)."}
+       
+    except Exception as e:
+        print(e)
+        raise HTTPException(status_code=400, detail="An error occurred while receiving data")
+
+
+
