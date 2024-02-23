@@ -109,16 +109,20 @@ async def get_usd_rate() -> dict:
 @app.get("/convert_crypto")
 async def convert_crypto(from_crypto: str, to_currency: str, amount: float) -> dict:
     # """
-    # Coded by: Tomasz Wisniewski
+    # Coded by: Bette Beaument
     # This endpoint allows you to convert crypto into any currency.
     # """
     try:
+        check_result = await check_crypto(from_crypto)
+        if "error_message" in check_result:
+            raise HTTPException(status_code=404, detail=check_result["error_message"])
+ 
         crypto_rate = await get_usd_rate()
         ex_rate = await exchange_rate(to_currency, "USD")
         rate_to_USD = float(ex_rate["exchange_rate"])
         rate_from_USD = float(crypto_rate['rates'][from_crypto])
         rate_crypto = rate_to_USD * rate_from_USD
-        converted_amount = (1/rate_crypto)* amount
+        converted_amount = (1 / rate_crypto) * amount
         return {
             "crypto_currency": from_crypto.upper(),
             "fiat_currency": to_currency.upper(),
@@ -126,8 +130,11 @@ async def convert_crypto(from_crypto: str, to_currency: str, amount: float) -> d
             "amount": amount,
             "converted_amount": converted_amount,
         }
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
+
  
 #@CODE : ADD ENDPOINT TO UPDATE PRICE OF ASSET IN ORDERBOOK DB
 #The code below starts you off using SQLAlchemy ORM
@@ -244,35 +251,6 @@ async def check_crypto(crypto_param: str) -> dict:
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
- 
-@app.get("/convert_crypto")
-async def convert_crypto(from_crypto: str, to_currency: str, amount: float) -> dict:
-    # """
-    # Coded by: Tomasz Wisniewski
-    # This endpoint allows you to convert crypto into any currency.
-    # """
-    try:
-        check_result = await check_crypto(from_crypto)
-        if "error_message" in check_result:
-            raise HTTPException(status_code=404, detail=check_result["error_message"])
- 
-        crypto_rate = await get_usd_rate()
-        ex_rate = await exchange_rate(to_currency, "USD")
-        rate_to_USD = float(ex_rate["exchange_rate"])
-        rate_from_USD = float(crypto_rate['rates'][from_crypto])
-        rate_crypto = rate_to_USD * rate_from_USD
-        converted_amount = (1 / rate_crypto) * amount
-        return {
-            "crypto_currency": from_crypto.upper(),
-            "fiat_currency": to_currency.upper(),
-            "crypto_rate": rate_crypto,
-            "amount": amount,
-            "converted_amount": converted_amount,
-        }
-    except HTTPException:
-        raise
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
 
 @app.get("/compare_currencies")
 async def compare_currencies(currency_1: str, currency_2: str) -> dict:
