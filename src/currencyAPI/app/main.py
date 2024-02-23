@@ -4,7 +4,7 @@ from datetime import *
  
 app = FastAPI()
  
-API_BASE_URL = "https://v6.exchangerate-api.com/v6/2d6661dc484a71b2ec96d0f6/latest/USD"
+API_BASE_URL = "https://api.exchangerate-api.com/v4/latest/"
 COINBASE_API_URL = "https://api.coinbase.com/v2/currencies/crypto"
 COINBASE_RATES = "https://api.coinbase.com/v2/exchange-rates/"
 COINBASE_FIAT = "https://api.coinbase.com/v2/currencies"
@@ -62,17 +62,18 @@ async def check_password_strength(password: str) -> dict:
 
 @app.get("/available_currencies")
 async def available_currencies() -> dict:
-    # Takes the data from API, converts it to a JSON format and extracts "id" and "data"
     try:
-        response = requests.get(COINBASE_FIAT)
+        response = requests.get(f"{API_BASE_URL}USD")
         if response.status_code == 200:
             data = response.json()
-            available_currencies = [currency["id"] for currency in data["data"]]
-            return {"available_currencies": available_currencies}
+            base_currency = data["base"]
+            available_currencies = list(data["rates"].keys())
+            return {"base_currency": base_currency, "available_currencies": available_currencies}
         else:
-            raise HTTPException(status_code=400, detail="From currency not supported")
+            raise HTTPException(status_code=400, detail="Failed to fetch available currencies")
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
+
  
 #Coded by: Alexander Naskinov
 
@@ -222,13 +223,18 @@ async def add_crypto_to_orderbook(crypto: str) -> dict:
 
 @app.get("/check_crypto")
 async def check_crypto(crypto_param: str) -> dict:
+   
+    # Coded by: Alex Naskinov
+    # This endpoint checks if a given crypto currency is available for trade
+    # Supports querying by either crypto ID or crypto name
+   
     try:
         response = requests.get(COINBASE_API_URL)
         if response.status_code == 200:
             data = response.json()
             crypto_codes = [currency["code"] for currency in data["data"]]
             crypto_names = [currency["name"] for currency in data["data"]]
-           
+            
             if crypto_param in crypto_codes or crypto_param in crypto_names:
                 return {"message": "This crypto currency is tradable"}
             else:
@@ -237,7 +243,7 @@ async def check_crypto(crypto_param: str) -> dict:
             raise HTTPException(status_code=400, detail="Failed to fetch crypto currencies")
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
-   
+
  
 @app.get("/convert_crypto")
 async def convert_crypto(from_crypto: str, to_currency: str, amount: float) -> dict:
@@ -265,6 +271,40 @@ async def convert_crypto(from_crypto: str, to_currency: str, amount: float) -> d
         }
     except HTTPException:
         raise
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+@app.get("/compare_currencies")
+async def compare_currencies(currency_1: str, currency_2: str) -> dict:
+    try:
+        currency_1 = currency_1.upper()  # Convert to uppercase
+        currency_2 = currency_2.upper()  # Convert to uppercase
+
+        response = requests.get(f"{API_BASE_URL}/{currency_1}")
+        if response.status_code == 200:
+            data = response.json()
+            base_currency = data["base"]
+            conversion_rates = data["rates"]
+
+            if currency_2 not in conversion_rates:
+                return {"error": f"{currency_2} not found in exchange rates."}
+
+            currency_1_value = conversion_rates.get(currency_1, None)
+            currency_2_value = conversion_rates[currency_2]
+
+            if currency_1_value is None:
+                return {"error": f"{currency_1} not found in exchange rates."}
+
+            if currency_2_value < 1:
+                message = f"{currency_2} is more valuable than {currency_1} compared to {base_currency}."
+            elif currency_2_value > 1:
+                message = f"{currency_1} is more valuable than {currency_2} compared to {base_currency}."
+            else:
+                message = f"{currency_1} and {currency_2} have the same value compared to {base_currency}."
+
+            return {"result": "success", "message": message}
+        else:
+            raise HTTPException(status_code=400, detail="Failed to fetch exchange rates.")
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
@@ -310,4 +350,30 @@ async def check_yesterdays_price(currency: str) -> dict:
         raise HTTPException(status_code=400, detail="An error occurred while receiving data")
 
 
-
+@app.post("/track-portfolio")
+async def track_portfolio(holdings: dict):
+    if "holdings" not in holdings:
+        raise HTTPException(status_code=400, detail="Invalid request")
+ 
+    total_portfolio_value = calculate_portfolio_value(holdings["holdings"])
+ 
+    return {"total_portfolio_value in GBP": total_portfolio_value}
+ 
+def calculate_portfolio_value(holdings: dict) -> float:
+    total_value = 0.0
+    exchange_rates = {
+        'USD': 0.79,
+        'EUR': 0.85,
+        'GBP': 1,
+        'JPY': 0.0052,
+        'AUD': 0.52,
+        'CAD': 0.59  
+    }
+ 
+    for currency, amount in holdings.items():
+        if currency not in exchange_rates:
+            raise HTTPException(status_code=400, detail=f"Invalid currency: {currency}")
+ 
+        exchange_rate = exchange_rates[currency]
+        total_value += amount * exchange_rate
+    return total_value
