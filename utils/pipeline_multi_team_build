@@ -1,7 +1,7 @@
 pipeline {
     agent none
     parameters {
-        string(name: 'STARTING_TEAM', defaultValue: '01', description: 'Starting team number (e.g., 01)')
+        string(name: 'STARTING_TEAM', defaultValue: '1', description: 'Starting team number (e.g., 01)')
         string(name: 'COHORT', defaultValue: 'c500', description: 'Cohort (e.g., c500)')
         string(name: 'NUMBER_OF_TEAMS', defaultValue: '1', description: 'Number of teams')
     }
@@ -9,15 +9,54 @@ pipeline {
         ECR_REPO = '108174090253.dkr.ecr.us-east-1.amazonaws.com/production-support-course'
     }
     stages {
-        stage("Build Teams") {
+        stage("Build Trading Front End") {
+            agent {
+                node {
+                    label 'kaniko'
+                }
+            }
             steps {
                 script {
                     def startingTeam = params.STARTING_TEAM.toInteger()
                     def numberOfTeams = params.NUMBER_OF_TEAMS.toInteger()
-                    for (int i = startingTeam; i <= startingTeam + numberOfTeams - 1; i++) {
+                    for (int i = startingTeam; i <= numberOfTeams; i++) {
                         def teamNumber = String.format("%02d", i)
                         buildTradingFrontEnd(teamNumber)
+                    }
+                }
+            }
+        }
+
+        stage("Build and Publish DB") {
+            agent {
+                node {
+                    label 'kaniko'
+                }
+            }
+            steps {
+                script {
+                    def startingTeam = params.STARTING_TEAM.toInteger()
+                    def numberOfTeams = params.NUMBER_OF_TEAMS.toInteger()
+                    for (int i = startingTeam; i <= numberOfTeams; i++) {
+                        def teamNumber = String.format("%02d", i)
                         buildAndPublishDB(teamNumber)
+                    }
+                }
+            }
+        }
+
+        stage("Build and Publish API") {
+            agent {
+                node {
+                    label 'kaniko'
+                }
+            }
+            steps {
+                script {
+                    def startingTeam = params.STARTING_TEAM.toInteger()
+                    def numberOfTeams = params.NUMBER_OF_TEAMS.toInteger()
+                    for (int i = startingTeam; i <= numberOfTeams; i++) {
+                        def teamNumber = String.format("%02d", i)
                         buildAndPublishAPI(teamNumber)
                     }
                 }
@@ -27,49 +66,22 @@ pipeline {
 }
 
 def buildTradingFrontEnd(teamNumber) {
-    stage("Build Trading Front End - Team ${teamNumber}") {
-        agent {
-            node {
-                label 'kaniko'
-            }
-        }
-        steps {
-            container(name: 'kaniko') {
-                sh """echo '{ "credsStore": "ecr-login" }' > /kaniko/.docker/config.json
-/kaniko/executor -f `pwd`/Dockerfiles/Dockerfile_nginx -c `pwd` --insecure --skip-tls-verify --cleanup --cache=false --destination=${ECR_REPO}:${COHORT}team${teamNumber}fe-dev-${BUILD_NUMBER}"""
-            }
-        }
+    container(name: 'kaniko') {
+        sh """echo '{ "credsStore": "ecr-login" }' > /kaniko/.docker/config.json
+            /kaniko/executor -f `pwd`/Dockerfiles/Dockerfile_nginx -c `pwd` --insecure --skip-tls-verify --cleanup --cache=false --destination=${ECR_REPO}:${COHORT}team${teamNumber}fe-dev-${BUILD_NUMBER}"""
     }
 }
 
 def buildAndPublishDB(teamNumber) {
-    stage("Build and Publish DB - Team ${teamNumber}") {
-        agent {
-            node {
-                label 'kaniko'
-            }
-        }
-        steps {
-            container(name: 'kaniko') {
-                sh """echo '{ "credsStore": "ecr-login" }' > /kaniko/.docker/config.json
-/kaniko/executor -f `pwd`/Dockerfiles/Dockerfile_mysql -c `pwd` --insecure --skip-tls-verify --cleanup --cache=false --destination=${ECR_REPO}:${COHORT}team${teamNumber}db-dev-${BUILD_NUMBER}"""
-            }
-        }
+    container(name: 'kaniko') {
+        sh """echo '{ "credsStore": "ecr-login" }' > /kaniko/.docker/config.json
+            /kaniko/executor -f `pwd`/Dockerfiles/Dockerfile_mysql -c `pwd` --insecure --skip-tls-verify --cleanup --cache=false --destination=${ECR_REPO}:${COHORT}team${teamNumber}db-dev-${BUILD_NUMBER}"""
     }
 }
 
 def buildAndPublishAPI(teamNumber) {
-    stage("Build and Publish API - Team ${teamNumber}") {
-        agent {
-            node {
-                label 'kaniko'
-            }
-        }
-        steps {
-            container(name: 'kaniko') {
-                sh """echo '{ "credsStore": "ecr-login" }' > /kaniko/.docker/config.json
-/kaniko/executor -f `pwd`/Dockerfiles/Dockerfile_fastapi -c `pwd` --insecure --skip-tls-verify --cleanup --cache=false --destination=${ECR_REPO}:${COHORT}team${teamNumber}api-dev-${BUILD_NUMBER}"""
-            }
-        }
+    container(name: 'kaniko') {
+        sh """echo '{ "credsStore": "ecr-login" }' > /kaniko/.docker/config.json
+            /kaniko/executor -f `pwd`/Dockerfiles/Dockerfile_fastapi -c `pwd` --insecure --skip-tls-verify --cleanup --cache=false --destination=${ECR_REPO}:${COHORT}team${teamNumber}api-dev-${BUILD_NUMBER}"""
     }
 }
