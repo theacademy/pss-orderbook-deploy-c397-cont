@@ -1,7 +1,7 @@
 pipeline {
     agent none
     parameters {
-        string(name: 'TEAM_NUMBER', defaultValue: '01', description: 'Team number (e.g., 01)')
+        string(name: 'STARTING_TEAM', defaultValue: '01', description: 'Starting team number (e.g., 01)')
         string(name: 'COHORT', defaultValue: 'c500', description: 'Cohort (e.g., c500)')
         string(name: 'NUMBER_OF_TEAMS', defaultValue: '1', description: 'Number of teams')
     }
@@ -9,14 +9,18 @@ pipeline {
         ECR_REPO = '108174090253.dkr.ecr.us-east-1.amazonaws.com/production-support-course'
     }
     stages {
-        // Iterate over the number of teams
-        script {
-            def numberOfTeams = params.NUMBER_OF_TEAMS.toInteger()
-            for (int i = 1; i <= numberOfTeams; i++) {
-                def teamNumber = String.format("%02d", i)
-                buildTradingFrontEnd(teamNumber)
-                buildAndPublishDB(teamNumber)
-                buildAndPublishAPI(teamNumber)
+        stage("Build Teams") {
+            steps {
+                script {
+                    def startingTeam = params.STARTING_TEAM.toInteger()
+                    def numberOfTeams = params.NUMBER_OF_TEAMS.toInteger()
+                    for (int i = startingTeam; i < startingTeam + numberOfTeams; i++) {
+                        def teamNumber = String.format("%02d", i)
+                        buildTradingFrontEnd(teamNumber)
+                        buildAndPublishDB(teamNumber)
+                        buildAndPublishAPI(teamNumber)
+                    }
+                }
             }
         }
     }
