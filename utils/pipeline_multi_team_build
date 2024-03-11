@@ -20,7 +20,7 @@ pipeline {
                     def startingTeam = params.STARTING_TEAM.toInteger()
                     def numberOfTeams = params.NUMBER_OF_TEAMS.toInteger()
                     for (int i = startingTeam; i <= numberOfTeams; i++) {
-                        def teamNumber = String.format("%02d", i)
+                        def teamNumber = formatTeamNumber(i)
                         buildTradingFrontEnd(teamNumber)
                     }
                 }
@@ -38,7 +38,7 @@ pipeline {
                     def startingTeam = params.STARTING_TEAM.toInteger()
                     def numberOfTeams = params.NUMBER_OF_TEAMS.toInteger()
                     for (int i = startingTeam; i <= numberOfTeams; i++) {
-                        def teamNumber = String.format("%02d", i)
+                        def teamNumber = formatTeamNumber(i)
                         buildAndPublishDB(teamNumber)
                     }
                 }
@@ -56,7 +56,7 @@ pipeline {
                     def startingTeam = params.STARTING_TEAM.toInteger()
                     def numberOfTeams = params.NUMBER_OF_TEAMS.toInteger()
                     for (int i = startingTeam; i <= numberOfTeams; i++) {
-                        def teamNumber = String.format("%02d", i)
+                        def teamNumber = formatTeamNumber(i)
                         buildAndPublishAPI(teamNumber)
                     }
                 }
@@ -83,5 +83,13 @@ def buildAndPublishAPI(teamNumber) {
     container(name: 'kaniko') {
         sh """echo '{ "credsStore": "ecr-login" }' > /kaniko/.docker/config.json
             /kaniko/executor -f `pwd`/Dockerfiles/Dockerfile_fastapi -c `pwd` --insecure --skip-tls-verify --cleanup --cache=false --destination=${ECR_REPO}:${COHORT}team${teamNumber}api-dev-${BUILD_NUMBER}"""
+    }
+}
+
+def formatTeamNumber(teamNumber) {
+    if (teamNumber > 100) {
+        return String.format("%03d", teamNumber)
+    } else {
+        return String.format("%02d", teamNumber)
     }
 }
