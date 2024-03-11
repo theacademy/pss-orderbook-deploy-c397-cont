@@ -1,0 +1,42 @@
+pipeline {
+    agent {
+        node {
+            label 'generic-agent'
+        }
+    }
+    parameters {
+        string(name: 'COHORT', defaultValue: 'c500', description: 'Cohort (e.g., c500)')
+        string(name: 'STARTING_TEAM', defaultValue: '1', description: 'Starting team number (e.g., 1)')
+        string(name: 'NUMBER_OF_TEAMS', defaultValue: '1', description: 'Number of teams')
+    }
+    stages {
+        stage('Test Availability of API Docs') {
+            steps {
+                script {
+                    def startingTeam = params.STARTING_TEAM.toInteger()
+                    def numberOfTeams = params.NUMBER_OF_TEAMS.toInteger()
+                    for (int i = startingTeam; i < startingTeam + numberOfTeams; i++) {
+                        def teamNumber = (i < 100) ? String.format("%02d", i) : "${i}"
+                        sh """
+                        curl "https://${COHORT}${teamNumber}dev-api.computerlab.online/docs"
+                        """
+                    }
+                }
+            }
+        }
+        stage('Test Availability of site') {
+            steps {
+                script {
+                    def startingTeam = params.STARTING_TEAM.toInteger()
+                    def numberOfTeams = params.NUMBER_OF_TEAMS.toInteger()
+                    for (int i = startingTeam; i < startingTeam + numberOfTeams; i++) {
+                        def teamNumber = (i < 100) ? String.format("%02d", i) : "${i}"
+                        sh """
+                        curl "https://${COHORT}${teamNumber}dev.computerlab.online/docs"
+                        """
+                    }
+                }
+            }
+        }
+    }
+}
