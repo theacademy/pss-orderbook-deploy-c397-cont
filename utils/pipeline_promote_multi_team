@@ -18,6 +18,10 @@ pipeline {
     """.stripIndent()
     }
   }
+  parameters {
+    string(name: 'COURSE', defaultValue: 'c777', description: 'Course identifier (e.g., c777)')
+    string(name: 'NUMBER_OF_TEAMS', defaultValue: '2', description: 'Number of teams')
+  }
   stages {
     stage('Promote to PROD env') {
       steps {
@@ -71,7 +75,5 @@ pipeline {
   }
   environment {
     ECR_REPO = '108174090253.dkr.ecr.us-east-1.amazonaws.com/production-support-course'
-    COURSE='c777'
-    NUMBER_OF_TEAM='02'
   }
 }
