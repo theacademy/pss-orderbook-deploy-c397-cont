@@ -18,7 +18,7 @@ pipeline {
                     for (int i = startingTeam; i < startingTeam + numberOfTeams; i++) {
                         def teamNumber = (i < 100) ? String.format("%02d", i) : "${i}"
                         sh """
-                        curl "https://${COHORT}${teamNumber}dev-api.computerlab.online/docs"
+                        curl "https://${COHORT}team${teamNumber}dev-api.computerlab.online/docs"
                         """
                     }
                 }
@@ -32,7 +32,7 @@ pipeline {
                     for (int i = startingTeam; i < startingTeam + numberOfTeams; i++) {
                         def teamNumber = (i < 100) ? String.format("%02d", i) : "${i}"
                         sh """
-                        curl "https://${COHORT}${teamNumber}dev.computerlab.online/docs"
+                        curl "https://${COHORT}team${teamNumber}dev.computerlab.online/docs"
                         """
                     }
                 }
