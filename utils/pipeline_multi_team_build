@@ -14,7 +14,7 @@ pipeline {
                 script {
                     def startingTeam = params.STARTING_TEAM.toInteger()
                     def numberOfTeams = params.NUMBER_OF_TEAMS.toInteger()
-                    for (int i = startingTeam; i <= numberOfTeams; i++) {
+                    for (int i = startingTeam; i <= startingTeam + numberOfTeams - 1; i++) {
                         def teamNumber = String.format("%02d", i)
                         buildTradingFrontEnd(teamNumber)
                         buildAndPublishDB(teamNumber)
