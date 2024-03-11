@@ -18,37 +18,39 @@ pipeline {
     """.stripIndent()
     }
   }
+parameters {
+  string(name: 'CourseName', description: 'Specify the cXXX part of the course to delete images for')
+  choice(name: 'ecrname', choices: ['production-support-course', 'sre-course'], description: 'Specify the registry to delete images from')
+}
+
   stages {
-    stage('Delete Old Images') {
+    stage('Delete Image') {
       steps {
           container(name: 'awscli') {
-            script{
-                sh '''
-                #!/bin/bash
-                
-                function delete_old_images() {
-
-                    local imagePattern=$1
-        
-                    #Get the number of images
-                    number_of_images=$(aws ecr list-images --repository-name production-support-course | grep -v Digest | grep "$imageName" | sed -n '=' | tail -1)
-                    
-                    #Get the list of images
-                    list_of_images=$(aws ecr list-images --repository-name production-support-course | grep -v Digest | grep "$imageName" | sort -V |  awk -F':' '{print$2}' | tr -d '"' | tr -d ' ' )
-                        for i in $list_of_images
-                        do
-                            aws ecr batch-delete-image --repository-name production-support-course --image-ids imageTag="$i"
-                        done;
-                }
-                delete_old_images "${imageName}"
-            '''
-            }
+            sh '''
+            allImages=$(aws ecr list-images --repository-name ${ecrname} | grep imageTag | awk -F: '{gsub(" ", "\\n", $2); print $2}' | sed 's/\"//g' | grep ${CourseName} | head -n 80 )            
+            while [ -n "$allImages" ]
+            do
+              for tagName in $(echo "$allImages" | head -n 80)
+              do
+                images="imageTag=$tagName $images"
+              done
+              if aws ecr batch-delete-image --repository-name ${ecrname} --image-ids $images | grep "not found"           
+              then
+                exit 0
+              fi
+              images=""
+              sleep 10
+              allImages=$(aws ecr list-images --repository-name ${ecrname} | grep imageTag | awk -F: '{gsub(" ", "\\n", $2); print $2}' | sed 's/\"//g' | grep ${CourseName} | head -n 80 )
+              # allImages=""
+            done
+'''
         }
       }
     }
   }
   environment {
-    ECR_REPO = '108174090253.dkr.ecr.us-east-1.amazonaws.com/production-support-course'
-    imageName='c375'
+    ECR_REPO = '108174090253.dkr.ecr.us-east-1.amazonaws.com/${ecrname}'
+    AWS_DEFAULT_REGION='us-east-1'
   }
 }
