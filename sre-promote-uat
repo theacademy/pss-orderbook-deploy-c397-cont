@@ -52,20 +52,20 @@ pipeline {
             fi
             
             # Check Front End
-            if [ $(aws ecr describe-images --repository-name production-support-course | grep "${image}${imgNum}" | wc -l) -eq 0 ]
+            if [ $(aws ecr describe-images --repository-name production-support-course | grep "${imageFEUatName}${imgNum}" | wc -l) -eq 0 ]
             then
               # We don't have prod so tag Dev to prod
-              if ! aws ecr put-image --repository-name production-support-course --image-tag ${imageFEProdName}${imgNum} --image-manifest "$FEMANIFEST"
+              if ! aws ecr put-image --repository-name production-support-course --image-tag ${imageFEUatName}${imgNum} --image-manifest "$FEMANIFEST"
               then
                 exitvalue=3
               fi
             fi
 
             # Check SSH
-            #if [ $(aws ecr describe-images --repository-name production-support-course | grep "${imageSSHProdName}${imgNum}" | wc -l) -eq 0 ]
+            #if [ $(aws ecr describe-images --repository-name production-support-course | grep "${imageSSHUatName}${imgNum}" | wc -l) -eq 0 ]
             #then
               # We don't have prod so tag Dev to prod
-              #if ! aws ecr put-image --repository-name production-support-course --image-tag ${imageSSHProdName}${imgNum} --image-manifest "$SSHMANIFEST"
+              #if ! aws ecr put-image --repository-name production-support-course --image-tag ${imageSSHUatName}${imgNum} --image-manifest "$SSHMANIFEST"
               #then
                 #exitvalue=3
               #fi
