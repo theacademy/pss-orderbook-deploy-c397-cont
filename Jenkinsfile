@@ -45,6 +45,11 @@ pipeline {
         }
       }
     }
+  stage("Testing vtallam"){
+    steps {
+          sh monitor.sh
+        }
+  }
   }
 
   environment {
