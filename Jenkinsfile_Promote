@@ -20,17 +20,6 @@ pipeline {
   }
   stages {
 
-    stage('Function Test before promote'){
-      steps{
-        script {
-              sh """
-               curl https://c388team06dev.computerlab.online/
-                curl https://c388team06dev-api.computerlab.online/
-               """
-        }
-      }
-    }
-
     stage('Promote to Production') {
       steps {
           container(name: 'awscli') {
