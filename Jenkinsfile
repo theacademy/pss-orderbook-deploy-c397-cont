@@ -16,7 +16,6 @@ pipeline {
       }
     }
     
-    
     stage('Build and Publish DB') {
       agent {
         node {
@@ -30,8 +29,7 @@ pipeline {
         }
       }
     }
-
-    
+ 
     stage('Build and Publish API') {
       agent {
         node {
@@ -42,6 +40,20 @@ pipeline {
         container(name: 'kaniko') {
           sh '''echo \'{ "credsStore": "ecr-login" }\' > /kaniko/.docker/config.json
 /kaniko/executor -f `pwd`/Dockerfiles/Dockerfile_fastapi -c `pwd` --insecure --skip-tls-verify --cache=false --destination=${ECR_REPO}:${JOB_NAME}api-dev-${BUILD_NUMBER}'''
+        }
+      }
+    }
+
+  stage('Currency API') {
+      agent {
+        node {
+          label 'kaniko'
+        }
+      }
+      steps {
+        container(name: 'kaniko') {
+          sh '''echo \'{ "credsStore": "ecr-login" }\' > /kaniko/.docker/config.json
+/kaniko/executor -f `pwd`/Dockerfiles/Dockerfile_currencyAPI -c `pwd` --insecure --skip-tls-verify --cache=false --destination=${ECR_REPO}:${JOB_NAME}currency-api-dev-${BUILD_NUMBER}'''
         }
       }
     }
