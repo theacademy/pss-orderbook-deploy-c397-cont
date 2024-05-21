@@ -19,8 +19,8 @@ pipeline {
     }
   }
   parameters {
-    string(name: 'COURSE', defaultValue: 'c777', description: 'Course identifier (e.g., c777)')
-    string(name: 'TEAM', defaultValue: 'team01', description: 'team')
+    string(name: 'COURSE', description: 'Course identifier (e.g., c777)')
+    string(name: 'TEAM', description: 'team (e.g., team01)')
   }
   stages {
     stage('Promote to PROD env') {
