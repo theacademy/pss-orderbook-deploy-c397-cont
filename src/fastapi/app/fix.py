@@ -3,8 +3,6 @@ import datetime
 from multiprocessing import Queue
 import json
 import logging
-import pandas as pd
-
 
 @dataclass
 class FixMessages:
