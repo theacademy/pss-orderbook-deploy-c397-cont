@@ -8,7 +8,6 @@ jobs:
   Build-To-ECR:
     runs-on: [self-hosted, eks-sre-infra]
     env:
-      ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
       ECR_REPOSITORY: "production-support-course"
       ECR_RR: "108174090253.dkr.ecr.us-east-1.amazonaws.com/production-support-course"
       COHORT: 'c397'
@@ -22,32 +21,30 @@ jobs:
       - name: Build and Push Front End
         id: push-img-fe
         env:
-          TAG: "${{ env.COHORT }}${{ env.TEAM }}fe-dev-${{ github.run_number }}"
-        uses: docker/build-push-action@v6
-        with:
-          context: ${{ github.workspace }}
-          file: ${{ github.workspace }}/Dockerfiles/Dockerfile_nginx
-          push: true
-          tags: $ECR_RR:$TAG
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          REPOSITORY: production-support-course
+          IMAGE_TAG: "${{env.cohort}}${{env.team}}fe-dev-${{ github.run_number }}"
+        run: |
+          docker build -t $REGISTRY/$REGISTRY_ALIAS/$REPOSITORY:$IMAGE_TAG -f Dockerfile_nginx ${{ github.workspace }}/Dockerfiles 
+          docker push $REGISTRY/$REGISTRY_ALIAS/$REPOSITORY:$IMAGE_TAG
 
       - name: Build and Push DB
-        id: build-img-db
+        id: push-img-db
         env:
-          TAG: "${{ env.COHORT }}${{ env.TEAM }}db-dev-${{ github.run_number }}"
-        uses: docker/build-push-action@v6
-        with:
-          context: ${{ github.workspace }}
-          file: ${{ github.workspace }}/Dockerfiles/Dockerfile_mysql
-          push: true
-          tags: $ECR_RR:$TAG
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          REPOSITORY: production-support-course
+          IMAGE_TAG: "${{env.cohort}}${{env.team}}db-dev-${{ github.run_number }}"
+        run: |
+          docker build -t $REGISTRY/$REGISTRY_ALIAS/$REPOSITORY:$IMAGE_TAG -f Dockerfile_mysql ${{ github.workspace }}/Dockerfiles 
+          docker push $REGISTRY/$REGISTRY_ALIAS/$REPOSITORY:$IMAGE_TAG
 
-      - name: Build and Push API
-        id: build-img-api
+      - name: Build and Push api
+        id: push-img-api
         env:
-          TAG: "${{ env.COHORT }}${{ env.TEAM }}api-dev-${{ github.run_number }}"
-        uses: docker/build-push-action@v6
-        with:
-          context: ${{ github.workspace }}
-          file: ${{ github.workspace }}/Dockerfiles/Dockerfile_api
-          push: true
-          tags: $ECR_RR:$TAG
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          REPOSITORY: production-support-course
+          IMAGE_TAG: "${{env.cohort}}${{env.team}}api-dev-${{ github.run_number }}"
+        run: |
+          docker build -t $REGISTRY/$REGISTRY_ALIAS/$REPOSITORY:$IMAGE_TAG -f Dockerfile_fastapi ${{ github.workspace }}/Dockerfiles 
+          docker push $REGISTRY/$REGISTRY_ALIAS/$REPOSITORY:$IMAGE_TAG
+        
