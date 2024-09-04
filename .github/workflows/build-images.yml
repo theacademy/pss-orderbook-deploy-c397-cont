@@ -4,6 +4,10 @@ on:
     branches:
       - main
 
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
   Build-To-ECR:
     runs-on: [self-hosted, eks-sre-infra]
