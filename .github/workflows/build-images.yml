@@ -19,6 +19,9 @@ jobs:
       #semantic-release-num: ${{ env.semantic-release-num }}
     steps:
 
+      - name: Display AWS CLI version
+        run: aws --version
+        
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
