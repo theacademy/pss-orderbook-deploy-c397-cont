@@ -13,7 +13,7 @@ jobs:
       ECR_RR: "108174090253.dkr.ecr.us-east-1.amazonaws.com/production-support-course"
       COHORT: 'c397'
       TEAM: 'team04'
-      #semantic-release-num: ${{ env.semantic-release-num }}
+      # semantic-release-num: ${{ env.semantic-release-num }}
     steps:
         
       - name: Configure AWS credentials
@@ -29,29 +29,25 @@ jobs:
         id: push-img-fe
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          REPOSITORY: production-support-course
-          IMAGE_TAG: "${{env.cohort}}${{env.team}}fe-dev-${{ github.run_number }}"
+          IMAGE_TAG: "${{ env.COHORT }}${{ env.TEAM }}fe-dev-${{ github.run_number }}"
         run: |
-          docker build -t $REGISTRY/$REGISTRY_ALIAS/$REPOSITORY:$IMAGE_TAG -f Dockerfile_nginx ${{ github.workspace }}/Dockerfiles 
-          docker push $REGISTRY/$REGISTRY_ALIAS/$REPOSITORY:$IMAGE_TAG
+          docker build -t $REGISTRY/${{ env.ECR_REPOSITORY }}:$IMAGE_TAG -f Dockerfile_nginx ${{ github.workspace }}/Dockerfiles 
+          docker push $REGISTRY/${{ env.ECR_REPOSITORY }}:$IMAGE_TAG
 
       - name: Build and Push DB
         id: push-img-db
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          REPOSITORY: production-support-course
-          IMAGE_TAG: "${{env.cohort}}${{env.team}}db-dev-${{ github.run_number }}"
+          IMAGE_TAG: "${{ env.COHORT }}${{ env.TEAM }}db-dev-${{ github.run_number }}"
         run: |
-          docker build -t $REGISTRY/$REGISTRY_ALIAS/$REPOSITORY:$IMAGE_TAG -f Dockerfile_mysql ${{ github.workspace }}/Dockerfiles 
-          docker push $REGISTRY/$REGISTRY_ALIAS/$REPOSITORY:$IMAGE_TAG
+          docker build -t $REGISTRY/${{ env.ECR_REPOSITORY }}:$IMAGE_TAG -f Dockerfile_mysql ${{ github.workspace }}/Dockerfiles 
+          docker push $REGISTRY/${{ env.ECR_REPOSITORY }}:$IMAGE_TAG
 
-      - name: Build and Push api
+      - name: Build and Push API
         id: push-img-api
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          REPOSITORY: production-support-course
-          IMAGE_TAG: "${{env.cohort}}${{env.team}}api-dev-${{ github.run_number }}"
+          IMAGE_TAG: "${{ env.COHORT }}${{ env.TEAM }}api-dev-${{ github.run_number }}"
         run: |
-          docker build -t $REGISTRY/$REGISTRY_ALIAS/$REPOSITORY:$IMAGE_TAG -f Dockerfile_fastapi ${{ github.workspace }}/Dockerfiles 
-          docker push $REGISTRY/$REGISTRY_ALIAS/$REPOSITORY:$IMAGE_TAG
-        
+          docker build -t $REGISTRY/${{ env.ECR_REPOSITORY }}:$IMAGE_TAG -f Dockerfile_fastapi ${{ github.workspace }}/Dockerfiles 
+          docker push $REGISTRY/${{ env.ECR_REPOSITORY }}:$IMAGE_TAG
