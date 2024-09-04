@@ -13,9 +13,11 @@ jobs:
       ECR_RR: "108174090253.dkr.ecr.us-east-1.amazonaws.com/production-support-course"
       COHORT: 'c397'
       TEAM: 'team04'
-      # semantic-release-num: ${{ env.semantic-release-num }}
+      #semantic-release-num: ${{ env.semantic-release-num }}
     steps:
-        
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -31,7 +33,7 @@ jobs:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           IMAGE_TAG: "${{ env.COHORT }}${{ env.TEAM }}fe-dev-${{ github.run_number }}"
         run: |
-          docker build -t $REGISTRY/${{ env.ECR_REPOSITORY }}:$IMAGE_TAG -f Dockerfile_nginx ${{ github.workspace }}/Dockerfiles 
+          docker build -t $REGISTRY/${{ env.ECR_REPOSITORY }}:$IMAGE_TAG -f Dockerfiles/Dockerfile_nginx .
           docker push $REGISTRY/${{ env.ECR_REPOSITORY }}:$IMAGE_TAG
 
       - name: Build and Push DB
@@ -40,7 +42,7 @@ jobs:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           IMAGE_TAG: "${{ env.COHORT }}${{ env.TEAM }}db-dev-${{ github.run_number }}"
         run: |
-          docker build -t $REGISTRY/${{ env.ECR_REPOSITORY }}:$IMAGE_TAG -f Dockerfile_mysql ${{ github.workspace }}/Dockerfiles 
+          docker build -t $REGISTRY/${{ env.ECR_REPOSITORY }}:$IMAGE_TAG -f Dockerfiles/Dockerfile_mysql .
           docker push $REGISTRY/${{ env.ECR_REPOSITORY }}:$IMAGE_TAG
 
       - name: Build and Push API
@@ -49,5 +51,5 @@ jobs:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           IMAGE_TAG: "${{ env.COHORT }}${{ env.TEAM }}api-dev-${{ github.run_number }}"
         run: |
-          docker build -t $REGISTRY/${{ env.ECR_REPOSITORY }}:$IMAGE_TAG -f Dockerfile_fastapi ${{ github.workspace }}/Dockerfiles 
+          docker build -t $REGISTRY/${{ env.ECR_REPOSITORY }}:$IMAGE_TAG -f Dockerfiles/Dockerfile_fastapi .
           docker push $REGISTRY/${{ env.ECR_REPOSITORY }}:$IMAGE_TAG
