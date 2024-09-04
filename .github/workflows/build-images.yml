@@ -12,7 +12,7 @@ jobs:
       ECR_REPOSITORY: "production-support-course"
       ECR_RR: "108174090253.dkr.ecr.us-east-1.amazonaws.com/production-support-course"
       COHORT: 'c397'
-      TEAM: 'team04'
+      TEAM: 'team03'
       #semantic-release-num: ${{ env.semantic-release-num }}
     steps:
       - name: Checkout Code
