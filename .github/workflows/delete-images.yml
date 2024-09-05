@@ -31,6 +31,7 @@ jobs:
       ECR_RR: "108174090253.dkr.ecr.us-east-1.amazonaws.com/production-support-course"
       COHORT: 'c397'
       TEAM: ${{ inputs.team_id }}
+      DEL_NUM: ${{ inputs.delete-number }}
       #semantic-release-num: ${{ env.semantic-release-num }}
     steps:
       - name: Checkout Code
@@ -84,8 +85,8 @@ jobs:
           do
               images=""
               
-              # Process the tags safely with head
-              for tagName in $(echo "$allImages" | head -n 80)
+              # Process the tags safely with head, where head value is delete_number
+              for tagName in $(echo "$allImages" | head -n $((delete_number - total_deleted)))
               do
                   images="imageTag=$tagName $images"
               done
@@ -113,6 +114,7 @@ jobs:
               fi
           done        
         env: 
+          delete_number: ${{ env.DEL_NUM }}
           ecr_rep: ${{ env.ECR_REPOSITORY }} 
           c_val: ${{ env.COHORT }} 
           t_val: ${{ env.TEAM }}
