@@ -57,7 +57,7 @@ jobs:
       - name: run_delete
         shell: bash
         run: |
-          allImages=( aws ecr list-images --repository-name "$ecr_rep" | grep imageTag | awk -F: '{gsub(" ", "\\n", $2); print $2}' | sed 's/\"//g' | grep "$c_val$tval" | head -n 80 )            
+          allImages=$(aws ecr list-images --repository-name "$ecr_rep" | grep imageTag | awk -F: '{gsub(" ", "\\n", $2); print $2}' | sed 's/\"//g' | grep "$c_val$tval" | head -n 80 )            
             while [ -n "$allImages" ]
             do
               for tagName in $(echo "$allImages" | head -n 80)
