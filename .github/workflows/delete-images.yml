@@ -5,11 +5,11 @@
 name: delete-images
 on: 
   workflow_dispatch: 
-    inputs: 
-      delete-number:
-        required: false 
-        type: int
-        description: number of images to delete (this isn't actually implemented yet)
+    #inputs: 
+      #delete-number:
+        #required: false 
+        #type: int
+        #description: number of images to delete (this isn't actually implemented yet)
 
 
 jobs:
