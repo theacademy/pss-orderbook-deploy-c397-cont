@@ -1,0 +1,76 @@
+#method here is copy-pasting the build-images.yml file, and editing to hopefully promote-build instead of building new o7 
+#who knows if it will work tho!! 
+name: Promote-Deliver-Images
+on: 
+  push:
+    branches:
+      - c397team03
+  workflow_dispatch: 
+    inputs:
+      team_id:
+        required: true
+        type: string
+      promotion-environment:
+        required: true
+        type: choice
+        description: choose environment to promote to
+        options:
+        - uat
+        - prod
+jobs:
+  Build-To-ECR:
+    runs-on: [self-hosted, eks-sre-infra]
+    env:
+      ECR_REPOSITORY: "production-support-course"
+      ECR_RR: "108174090253.dkr.ecr.us-east-1.amazonaws.com/production-support-course"
+      COHORT: 'c397'
+      TEAM: 'team03'
+      #semantic-release-num: ${{ env.semantic-release-num }}
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: us-east-1
+    
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Check and Promote Front End
+        id: push-img-fe
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: "${{ env.COHORT }}${{ env.TEAM }}fe-dev-${{ github.run_number }}"
+        run: |
+          docker build -t $REGISTRY/${{ env.ECR_REPOSITORY }}:$IMAGE_TAG -f Dockerfiles/Dockerfile_nginx .
+          docker push $REGISTRY/${{ env.ECR_REPOSITORY }}:$IMAGE_TAG
+
+      - name: Check and Promote Data Base
+        id: push-img-db
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: "${{ env.COHORT }}${{ env.TEAM }}db-dev-${{ github.run_number }}"
+        run: |
+          docker build -t $REGISTRY/${{ env.ECR_REPOSITORY }}:$IMAGE_TAG -f Dockerfiles/Dockerfile_mysql .
+          docker push $REGISTRY/${{ env.ECR_REPOSITORY }}:$IMAGE_TAG
+
+      - name: Check and Promote API
+        id: push-img-api
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: "${{ env.COHORT }}${{ env.TEAM }}api-dev-${{ github.run_number }}"
+        run: |
+          docker build -t $REGISTRY/${{ env.ECR_REPOSITORY }}:$IMAGE_TAG -f Dockerfiles/Dockerfile_fastapi .
+          docker push $REGISTRY/${{ env.ECR_REPOSITORY }}:$IMAGE_TAG
+
+      - name: Build and Push Currency API
+        id: push-img-currencyapi
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: "${{ env.COHORT }}${{ env.TEAM }}currency-api-dev-${{ github.run_number }}"
+        run: |
+          docker build -t $REGISTRY/${{ env.ECR_REPOSITORY }}:$IMAGE_TAG -f Dockerfiles/Dockerfile_currencyAPI .
+          docker push $REGISTRY/${{ env.ECR_REPOSITORY }}:$IMAGE_TAG
