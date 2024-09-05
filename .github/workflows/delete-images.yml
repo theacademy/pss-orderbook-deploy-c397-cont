@@ -45,6 +45,15 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
+      - name: Install AWS CLI v2
+        shell: bash
+        run:  |
+              curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o /tmp/awscliv2.zip
+              unzip -q /tmp/awscliv2.zip -d /tmp
+              rm /tmp/awscliv2.zip
+              sudo /tmp/aws/install --update
+              rm -rf /tmp/aws/
+
       - name: run_delete
         shell: bash
         run: |
