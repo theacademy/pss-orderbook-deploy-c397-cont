@@ -58,24 +58,33 @@ jobs:
         shell: bash
         run: |
           rawImages=$(aws ecr list-images --repository-name "$ecr_rep")
-          imageTags=$(echo "$rawImages" | grep imageTag)
+          imageTags=$(echo "$rawImages" | grep imageTag | head -n 80)
           filteredTags=$(echo "$imageTags" | awk -F: '{gsub(" ", "\n", $2); print $2}' | sed 's/\"//g')
-          allImages=$(echo "$filteredTags" | grep "$c_val$tval")            
-            while [ -n "$allImages" ]
-            do
+          allImages=$(echo "$filteredTags" | grep "${c_val}_${t_val}")
+
+          while [ -n "$allImages" ]
+          do
+              images=""
               for tagName in $(echo "$allImages" | head -n 80)
               do
-                images="imageTag=$tagName $images"
+                  images="imageTag=$tagName $images"
               done
-              if aws ecr batch-delete-image --repository-name ${ecr_rep} --image-ids $images | grep "not found"           
-              then
-                exit 0
+
+              if [ -n "$images" ]; then
+                  if aws ecr batch-delete-image --repository-name ${ecr_rep} --image-ids $images | grep "not found"; then
+                      exit 0
+                  fi
               fi
+
               images=""
               sleep 10
-              allImages=$(aws ecr list-images --repository-name ${ecr_rep} | grep imageTag | awk -F: '{gsub(" ", "\\n", $2); print $2}' | sed 's/\"//g' | grep ${c_val}${t_val} | head -n 80 )
-              # allImages=""
-            done
+
+              rawImages=$(aws ecr list-images --repository-name "$ecr_rep")
+              imageTags=$(echo "$rawImages" | grep imageTag | head -n 80)
+              filteredTags=$(echo "$imageTags" | awk -F: '{gsub(" ", "\n", $2); print $2}' | sed 's/\"//g')
+              allImages=$(echo "$filteredTags" | grep "${c_val}_${t_val}")
+          done
+                    
         env: 
           ecr_rep: ${{ env.ECR_REPOSITORY }} 
           c_val: ${{ env.COHORT }} 
