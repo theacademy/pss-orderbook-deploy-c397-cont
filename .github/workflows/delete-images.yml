@@ -58,33 +58,60 @@ jobs:
         shell: bash
         run: |
           rawImages=$(aws ecr list-images --repository-name "$ecr_rep")
-          imageTags=$(echo "$rawImages" | grep imageTag | head -n 80)
-          filteredTags=$(echo "$imageTags" | awk -F: '{gsub(" ", "\n", $2); print $2}' | sed 's/\"//g')
-          allImages=$(echo "$filteredTags" | grep "${c_val}_${t_val}")
 
+          # Safely extract imageTags
+          imageTags=$(echo "$rawImages" | grep imageTag || true)
+
+          # Handle if no image tags are found
+          if [ -z "$imageTags" ]; then
+              echo "No images found in repository."
+              exit 0
+          fi
+
+          # Process tags with awk and sed, and concatenate $c_val and $t_val
+          filteredTags=$(echo "$imageTags" | awk -F: '{gsub(" ", "\n", $2); print $2}' | sed 's/\"//g')
+
+          # Concatenate $c_val and $t_val and filter
+          allImages=$(echo "$filteredTags" | grep "${c_val}${t_val}" || true)
+
+          if [ -z "$allImages" ]; then
+              echo "No images matching ${c_val}${t_val} found."
+              exit 0
+          fi
+
+          # Main deletion loop
           while [ -n "$allImages" ]
           do
               images=""
+              
+              # Process the tags safely with head
               for tagName in $(echo "$allImages" | head -n 80)
               do
                   images="imageTag=$tagName $images"
               done
 
+              # Make sure images is not empty before trying to delete
               if [ -n "$images" ]; then
-                  if aws ecr batch-delete-image --repository-name ${ecr_rep} --image-ids $images | grep "not found"; then
+                  if aws ecr batch-delete-image --repository-name "${ecr_rep}" --image-ids $images | grep "not found"; then
                       exit 0
                   fi
               fi
-
+              
               images=""
               sleep 10
 
+              # Fetch images again for the next loop iteration
               rawImages=$(aws ecr list-images --repository-name "$ecr_rep")
-              imageTags=$(echo "$rawImages" | grep imageTag | head -n 80)
+              imageTags=$(echo "$rawImages" | grep imageTag || true)
               filteredTags=$(echo "$imageTags" | awk -F: '{gsub(" ", "\n", $2); print $2}' | sed 's/\"//g')
-              allImages=$(echo "$filteredTags" | grep "${c_val}_${t_val}")
-          done
-                    
+              allImages=$(echo "$filteredTags" | grep "${c_val}${t_val}" || true)
+
+              # Break the loop if no more images match
+              if [ -z "$allImages" ]; then
+                  echo "No more images to delete."
+                  break
+              fi
+          done        
         env: 
           ecr_rep: ${{ env.ECR_REPOSITORY }} 
           c_val: ${{ env.COHORT }} 
