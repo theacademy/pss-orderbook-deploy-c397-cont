@@ -57,10 +57,8 @@ jobs:
       - name: run_delete
         shell: bash
         run: |
-          echo $ecr_rep
-          echo $c_val
-          echo $t_val
-          allImages=$(aws ecr list-images --repository-name $ecr_rep | grep imageTag | awk -F: '{gsub(" ", "\\n", $2); print $2}' | sed 's/\"//g' | grep $c_val | head -n 80 )            
+          sh '''
+          allImages=$(aws ecr list-images --repository-name ${ecr_rep} | grep imageTag | awk -F: '{gsub(" ", "\\n", $2); print $2}' | sed 's/\"//g' | grep ${c_val} | head -n 80 )            
             while [ -n "$allImages" ]
             do
               for tagName in $(echo "$allImages" | head -n 80)
@@ -76,6 +74,7 @@ jobs:
               allImages=$(aws ecr list-images --repository-name ${ecr_rep} | grep imageTag | awk -F: '{gsub(" ", "\\n", $2); print $2}' | sed 's/\"//g' | grep ${c_val}${t_val} | head -n 80 )
               # allImages=""
             done
+          '''
         env: 
           ecr_rep: ${{ env.ECR_REPOSITORY }} 
           c_val: ${{ env.COHORT }} 
