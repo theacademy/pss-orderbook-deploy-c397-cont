@@ -11,7 +11,7 @@ on:
 
 jobs:
   DeleteOldImages:
-    runs-on: [self-hosted, eks-sre-infra]
+    runs-on: [self-hosted, eks-sre-infra, ubuntu-latest]
     env:
       ECR_REPOSITORY: "production-support-course"
       ECR_RR: "108174090253.dkr.ecr.us-east-1.amazonaws.com/production-support-course"
