@@ -1,6 +1,18 @@
 name: Build-Deliver-Images
 on: 
   workflow_dispatch: 
+    inputs: 
+      team_id:
+        required: true
+        description: your team's number
+        type: choice
+        options:
+        - team01
+        - team02
+        - team03
+        - team04
+        - team05
+        - team06
     
 jobs:
   Build-To-ECR:
@@ -9,7 +21,7 @@ jobs:
       ECR_REPOSITORY: "production-support-course"
       ECR_RR: "108174090253.dkr.ecr.us-east-1.amazonaws.com/production-support-course"
       COHORT: 'c397'
-      TEAM: 'team03'
+      TEAM: ${{ inputs.team_id }}
       #semantic-release-num: ${{ env.semantic-release-num }}
     steps:
       - name: Checkout Code
