@@ -58,7 +58,7 @@ jobs:
         shell: bash
         run: |
           rawImages=$(aws ecr list-images --repository-name "$ecr_rep")
-          imageTags=$(echo "$rawImages" | grep imageTag | head -n 80) 
+          imageTags=$(echo "$rawImages" | grep imageTag)
           filteredTags=$(echo "$imageTags" | awk -F: '{gsub(" ", "\n", $2); print $2}' | sed 's/\"//g')
           allImages=$(echo "$filteredTags" | grep "$c_val$tval")            
             while [ -n "$allImages" ]
