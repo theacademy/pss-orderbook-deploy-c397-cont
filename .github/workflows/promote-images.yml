@@ -2,9 +2,6 @@
 #who knows if it will work tho!! 
 name: Promote-Deliver-Images
 on: 
-  push:
-    branches:
-      - c397team03
   workflow_dispatch: 
     inputs:
       team_id:

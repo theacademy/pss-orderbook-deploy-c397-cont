@@ -1,10 +1,7 @@
 name: Build-Deliver-Images
 on: 
-  push:
-    branches:
-      - c397team03
   workflow_dispatch: 
-
+    
 jobs:
   Build-To-ECR:
     runs-on: [self-hosted, eks-sre-infra]
